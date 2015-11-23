@@ -1,7 +1,9 @@
 package de.digitalstep.timetrack.io
 
+import java.time.LocalDate
+
 trait TaskSink {
 
-  def take(t: Task): Unit
+  def add(date: LocalDate, t: Task): TaskSink
 
 }

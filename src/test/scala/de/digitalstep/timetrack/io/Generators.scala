@@ -2,13 +2,14 @@ package de.digitalstep.timetrack.io
 
 import java.time.{LocalDate, LocalTime}
 
+import de.digitalstep.timetrack.io.Generators._
 import org.scalacheck.Arbitrary._
-import org.scalacheck.Gen
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen._
 
-private[io] object AstModelGenerators extends AstModelGenerators
+private[timetrack] object Generators extends Generators
 
-trait AstModelGenerators {
+trait Generators {
 
   val genTime = for {
     hour ← choose(0, 23)
@@ -36,10 +37,19 @@ trait AstModelGenerators {
     tasks ← containerOf[List, Task](task)
   } yield Day(date, tasks)
 
+  val genDays = containerOf[List, Day](genDay)
+
   val genComment = for {
     text ← arbitrary[String]
   } yield Comment(text)
 
   val genData = containerOf[List, Section](oneOf(genDay, genComment))
+
+  object Implicits {
+    implicit val arbitraryData = Arbitrary(genData)
+    implicit val arbitraryDays = Arbitrary(genDays)
+    implicit val arbitraryDate = Arbitrary(genDate)
+    implicit val arbitraryTask = Arbitrary(genTask)
+  }
 
 }

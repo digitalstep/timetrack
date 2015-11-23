@@ -2,7 +2,6 @@ package de.digitalstep.timetrack
 
 import java.util.Locale
 
-import de.digitalstep.timetrack.io.FileDatabase
 import de.digitalstep.timetrack.ui._
 
 import scala.language.implicitConversions
@@ -20,11 +19,11 @@ object Application extends JFXApp {
   def lt(a: WorkUnitAdapter, b: WorkUnitAdapter) = a.get > b.get
 
   private[this] val workUnits: ObservableBuffer[WorkUnitAdapter] =
-    ObservableBuffer(Database().findAll.map(WorkUnitAdapter.apply).toSeq)
+    ObservableBuffer(Repository().findAll.map(WorkUnitAdapter.apply).toSeq)
 
   workUnits.onChange((buffer, changes) ⇒ for (change ← changes) {
     change match {
-      case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ Database().add(added.map(_.get))
+      case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ Repository().add(added.map(_.get))
       case x ⇒ println(x)
     }
 

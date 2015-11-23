@@ -4,11 +4,6 @@ import java.time.format.{DateTimeFormatter, FormatStyle}
 import java.time.{Duration, LocalDateTime}
 import java.util.Locale
 
-import de.digitalstep.timetrack.io.FileDatabase
-
-import scala.reflect.io.File
-import scala.reflect.io.Path.string2path
-
 /**
  * @author gunnar
  */
@@ -24,11 +19,11 @@ object Launcher extends App {
   }
 
   def printEntries(options: OptionMap): Unit = {
-    Database().findAll foreach println
+    Repository().findAll foreach println
   }
 
   def printDays(options: OptionMap): Unit = {
-    val map = Database().findDays
+    val map = Repository().findDays
     map.keys.toList.sortWith(_ isBefore _) foreach { x ⇒
       val day = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(x)
       val workUnits = map(x)

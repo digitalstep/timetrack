@@ -6,7 +6,7 @@ import org.scalatest.prop.PropertyChecks
 /**
   * Base class for property-based unit tests.
   */
-class PropertySpecification
+abstract class PropertySpecification
   extends PropSpec with PropertyChecks
   with Matchers
 
