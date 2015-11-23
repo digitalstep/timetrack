@@ -7,39 +7,29 @@ import org.parboiled2.ParserInput
 
 import scala.collection.mutable
 import scala.language.implicitConversions
-import scala.reflect.io.File
+import scala.reflect.io.{Path, File}
 import scala.reflect.io.Path.string2path
+import scala.io.Source.fromInputStream
 
 object FileDatabase {
-  private[this] def file2string(file: File): String = io.Source.fromInputStream(file.inputStream()).mkString
+  private[this] implicit def path2string(path: Path): ParserInput = fromInputStream(File(path).inputStream()).mkString
 
-  private[this] val file = File(sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt")
+  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt"
 
-  def apply(): FileDatabase = apply(file)
+  def apply(): FileDatabase = apply(path)
 
-  def apply(file: File): FileDatabase = new FileDatabase(
-    new DataReader {
-      override def sections = InputParser(file2string(file)).sections
-    })
+  def apply(path: Path): FileDatabase = new FileDatabase(InputParser(path).sections)
 }
 
-class FileDatabase(input: DataReader) extends Database {
+class FileDatabase(input: ⇒ Iterable[Section]) extends Database {
 
-  private[this] val sections: mutable.Seq[Section] = mutable.Seq() ++ input.sections
-
-  private[this] val workUnits: mutable.SortedSet[WorkUnit] = mutable.SortedSet(load().toSeq: _*)
-
-  private[this] def createWorkUnit(d: Day, t: Task) = WorkUnit(
-    from = LocalDateTime.of(d.date, t.from),
-    to = LocalDateTime.of(d.date, t.to),
-    description = t.name
-  )
+  private[this] val sections: mutable.ListBuffer[Section] = mutable.ListBuffer() ++ input
 
   private[this] def mergeWorkUnit(workUnit: WorkUnit) = {
     val day = sections.find {
       case Day(x, _) if x == workUnit.date ⇒ true
       case _ ⇒ false
-    }.asInstanceOf[Option[Day]] getOrElse Day(workUnit.date, Seq())
+    }.asInstanceOf[Option[Day]] getOrElse Day(workUnit.date, List())
 
     val newDay = day.copy(
       tasks = Task(workUnit.from.toLocalTime, workUnit.to.toLocalTime, workUnit.description) :: day.tasks.toList
@@ -50,22 +40,22 @@ class FileDatabase(input: DataReader) extends Database {
 
   }
 
+  def days: Seq[Day] = sections.filter(_.isInstanceOf[Day]).asInstanceOf[Seq[Day]]
 
-  def load(): Iterable[WorkUnit] = {
-    val days = sections.filter(_.isInstanceOf[Day]).asInstanceOf[Seq[Day]]
+  def findDay(date: LocalDate): Option[Day] =
+    sections.
+      find(x ⇒ x.isInstanceOf[Day] && x.asInstanceOf[Day].date == date).
+      map(_.asInstanceOf[Day])
 
-    for (d ← days; t ← d.tasks) yield createWorkUnit(d, t)
-  }
+  def toTask(workUnit: WorkUnit): Task = workUnit.toTask
 
   def save(): Unit = {
     sections foreach println
   }
 
-  def add(x: WorkUnit*): Unit = add(x.toSeq)
+  def add(date: LocalDate, task: Task): Database = {
+    sections += Day(date, task :: findDay(date).toList.flatMap(_.tasks))
+    this
+  }
 
-  def add(x: Traversable[WorkUnit]): Unit = workUnits ++= x
-
-  def findAll: Iterable[WorkUnit] = load().toSeq.sorted.reverse
-
-  def findDays: Map[LocalDate, Iterable[WorkUnit]] = findAll.groupBy(_.date)
 }

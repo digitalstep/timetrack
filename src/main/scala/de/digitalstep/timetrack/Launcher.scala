@@ -15,7 +15,6 @@ import scala.reflect.io.Path.string2path
 object Launcher extends App {
   Locale.setDefault(Locale.GERMANY)
 
-  final val file = File(sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt")
   type OptionMap = Map[Symbol, Any]
 
   private[this] def printUsage(options: OptionMap): Unit = println {
@@ -25,11 +24,11 @@ object Launcher extends App {
   }
 
   def printEntries(options: OptionMap): Unit = {
-    FileDatabase(file).findAll foreach println
+    Database().findAll foreach println
   }
 
   def printDays(options: OptionMap): Unit = {
-    val map = FileDatabase(file).findDays
+    val map = Database().findDays
     map.keys.toList.sortWith(_ isBefore _) foreach { x ⇒
       val day = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).format(x)
       val workUnits = map(x)

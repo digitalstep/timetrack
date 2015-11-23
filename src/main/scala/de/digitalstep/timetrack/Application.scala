@@ -20,11 +20,11 @@ object Application extends JFXApp {
   def lt(a: WorkUnitAdapter, b: WorkUnitAdapter) = a.get > b.get
 
   private[this] val workUnits: ObservableBuffer[WorkUnitAdapter] =
-    ObservableBuffer(FileDatabase().findAll.map(WorkUnitAdapter.apply).toSeq)
+    ObservableBuffer(Database().findAll.map(WorkUnitAdapter.apply).toSeq)
 
   workUnits.onChange((buffer, changes) ⇒ for (change ← changes) {
     change match {
-      case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ FileDatabase().add(added.map(_.get))
+      case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ Database().add(added.map(_.get))
       case x ⇒ println(x)
     }
 

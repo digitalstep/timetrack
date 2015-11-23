@@ -3,9 +3,10 @@ package de.digitalstep.timetrack.io
 import java.time.{LocalDate, LocalTime}
 
 import org.scalacheck.Arbitrary._
+import org.scalacheck.Gen
 import org.scalacheck.Gen._
 
-object AstModelGenerators extends AstModelGenerators
+private[io] object AstModelGenerators extends AstModelGenerators
 
 trait AstModelGenerators {
 
@@ -20,21 +21,25 @@ trait AstModelGenerators {
     day ← choose(1, 28)
   } yield LocalDate.of(year, month, day)
 
+  val genDescription = arbitrary[String]
+
   val genTask = for {
     from ← genTime
     to ← genTime
-    desc ← arbitrary[String]
+    desc ← genDescription
   } yield Task(from, to, desc)
 
-  val genDay = for {
+  def genDay: Gen[Day] = genDay(genTask)
+
+  def genDay(task: Gen[Task]): Gen[Day] = for {
     date ← genDate
-    tasks ← containerOf[List, Task](genTask)
+    tasks ← containerOf[List, Task](task)
   } yield Day(date, tasks)
 
   val genComment = for {
     text ← arbitrary[String]
   } yield Comment(text)
 
-  val genData = containerOf[List, Section](genDay)
+  val genData = containerOf[List, Section](oneOf(genDay, genComment))
 
 }
