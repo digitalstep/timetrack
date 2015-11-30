@@ -1,7 +1,7 @@
 package de.digitalstep.timetrack
 
-import java.time.format.{FormatStyle, DateTimeFormatter}
-import java.time.{LocalDateTime, LocalTime, LocalDate}
+import java.time.{LocalDate, LocalDateTime, LocalTime}
+
 import scala.language.implicitConversions
 
 object Implicits {
