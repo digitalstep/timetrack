@@ -5,7 +5,6 @@ import java.time.LocalDate
 import de.digitalstep.timetrack.io._
 import de.digitalstep.timetrack.test.PropertySpecification
 import org.scalacheck.Arbitrary
-import org.scalacheck.Gen._
 import collection.mutable
 
 class DatabaseSpecification extends PropertySpecification {
@@ -15,14 +14,14 @@ class DatabaseSpecification extends PropertySpecification {
 
   private[this] def database(data: List[Day]): Repository = new Repository(
     new Storage {
-      val buffer: mutable.ListBuffer[Day] = mutable.ListBuffer() ++ data
 
-      def sections: Iterable[Section] = buffer.toSeq
+      val sections: mutable.ListBuffer[Section] = mutable.ListBuffer() ++ data
 
       def add(date: LocalDate, t: Task): Storage = {
-        buffer += Day(date, Seq(t))
+        sections += Day(date, Seq(t))
         this
       }
+
     }
   )
 

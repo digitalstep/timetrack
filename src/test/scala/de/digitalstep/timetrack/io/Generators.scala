@@ -45,7 +45,12 @@ trait Generators {
 
   val genData = containerOf[List, Section](oneOf(genDay, genComment))
 
+  val genInputText = for {
+    data ← genData
+  } yield InputText(data)
+
   object Implicits {
+    implicit val arbitraryInput = Arbitrary(genInputText)
     implicit val arbitraryData = Arbitrary(genData)
     implicit val arbitraryDays = Arbitrary(genDays)
     implicit val arbitraryDate = Arbitrary(genDate)

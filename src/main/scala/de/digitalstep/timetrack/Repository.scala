@@ -15,7 +15,9 @@ class Repository(storage: Storage) {
     this
   }
 
-  def add(x: Traversable[WorkUnit]): Repository = x.foldLeft(this)(_ add _)
+  def add(x: Traversable[WorkUnit]): Repository = x.foldLeft(this) {
+    _ add _
+  }
 
   def findAll: Iterable[WorkUnit] = {
     val tasks = for (d ← storage.days; t ← d.tasks) yield WorkUnit(d, t)
