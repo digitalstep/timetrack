@@ -1,8 +1,8 @@
-package de.digitalstep.timetrack.io
+package de.digitalstep.timetrack.persistence
 
 import java.time.{LocalDate, LocalTime}
 
-import de.digitalstep.timetrack.io.Generators._
+import de.digitalstep.timetrack.persistence.Generators._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen._

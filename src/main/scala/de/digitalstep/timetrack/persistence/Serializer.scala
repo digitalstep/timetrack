@@ -1,4 +1,4 @@
-package de.digitalstep.timetrack.io
+package de.digitalstep.timetrack.persistence
 
 import java.io.{PrintWriter, OutputStream}
 
@@ -8,7 +8,7 @@ trait Serializer {
 
   protected def close(out: AutoCloseable): Unit = out.close()
 
-  protected[io] def serialize(e: Element): Unit = {
+  protected[persistence] def serialize(e: Element): Unit = {
     val writer = new PrintWriter(outputStream())
     try {
       writer.println(toString(e))

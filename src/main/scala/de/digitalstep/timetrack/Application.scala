@@ -2,7 +2,7 @@ package de.digitalstep.timetrack
 
 import java.util.Locale
 
-import de.digitalstep.timetrack.ui._
+import ui._
 
 import scala.language.implicitConversions
 import scalafx.Includes._
@@ -16,17 +16,20 @@ import scalafx.scene.layout.BorderPane
 object Application extends JFXApp {
   Locale.setDefault(Locale.GERMANY)
 
-  def lt(a: WorkUnitAdapter, b: WorkUnitAdapter) = a.get > b.get
+  private[this] val repository = Repository()
+  repository.onChange(change ⇒ {
+    println(change)
+    println(repository.findAll.mkString)
+  })
 
   private[this] val workUnits: ObservableBuffer[WorkUnitAdapter] =
-    ObservableBuffer(Repository().findAll.map(WorkUnitAdapter.apply).toSeq)
+    ObservableBuffer(repository.findAll.map(WorkUnitAdapter.apply).toSeq)
 
   workUnits.onChange((buffer, changes) ⇒ for (change ← changes) {
     change match {
-      case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ Repository().add(added.map(_.get))
+      case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ repository.add(added.map(_.get))
       case x ⇒ println(x)
     }
-
   })
 
   lazy val toolbar = new ToolBar {
@@ -38,7 +41,7 @@ object Application extends JFXApp {
           dialog.showAndWait() match {
             case Some(_) ⇒ {
               workUnits.add(dialog.getResult)
-              workUnits.sort(lt)
+              workUnits.sort((a, b) ⇒ a.get > b.get)
             }
             case _ ⇒ println("Cancelled")
           }

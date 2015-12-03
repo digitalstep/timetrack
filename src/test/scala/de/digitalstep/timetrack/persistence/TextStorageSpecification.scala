@@ -1,4 +1,4 @@
-package de.digitalstep.timetrack.io
+package de.digitalstep.timetrack.persistence
 
 import java.io.{ByteArrayOutputStream, OutputStream}
 import java.time.{LocalTime, LocalDate}
@@ -37,11 +37,18 @@ class TextStorageSpecification extends PropertySpecification {
     override protected def close(out: AutoCloseable): Unit = out.close()
   }
 
+  val initialTestData = List(
+    Comment("-*-Text-*-"),
+    Day(testDate1, Seq(
+      testTask1)),
+    Day(date(2015, 11, 30), Seq(
+      testTask1,
+      testTask2)))
+
   def tested = new TextStorage(
-    () ⇒ List(
-      Comment("-*-Text-*-"),
-      Day(testDate1, Seq(testTask1)),
-      Day(date(2015, 11, 30), Seq(testTask1, testTask2))),
+    () ⇒ {
+      initialTestData
+    },
     mockSerializer)
 
   property("add") {
@@ -66,6 +73,8 @@ class TextStorageSpecification extends PropertySpecification {
         |11:00 - 12:00   Test
         |
         |""".stripMargin
+
+        tested.sections should be (initialTestData)
   }
 
 }

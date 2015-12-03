@@ -1,5 +1,7 @@
 package de.digitalstep.timetrack.ui
 
+import java.time.temporal.{ChronoUnit, TemporalUnit}
+
 import de.digitalstep.timetrack.WorkUnit
 
 import scalafx.beans.property.{ObjectProperty, StringProperty}
@@ -10,8 +12,8 @@ class WorkUnitAdapter(workUnit: WorkUnit) {
 
   val descriptionProperty = StringProperty(description)
   val dayProperty = ObjectProperty(date)
-  val fromProperty = ObjectProperty(from.toLocalTime)
-  val toProperty = ObjectProperty(to.toLocalTime)
+  val fromProperty = ObjectProperty(from.toLocalTime.truncatedTo(ChronoUnit.MINUTES))
+  val toProperty = ObjectProperty(to.toLocalTime.truncatedTo(ChronoUnit.MINUTES))
 
   def get: WorkUnit = WorkUnit(
     dayProperty.value,

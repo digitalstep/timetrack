@@ -1,4 +1,4 @@
-package de.digitalstep.timetrack.io
+package de.digitalstep.timetrack.persistence
 
 object Storage {
 

@@ -2,7 +2,7 @@ package de.digitalstep.timetrack
 
 import java.time.{LocalDate, LocalTime}
 
-package object io {
+package object persistence {
 
   def time(hours: Int, minutes: Int) = LocalTime.of(hours, minutes)
 

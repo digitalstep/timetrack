@@ -2,17 +2,45 @@ package de.digitalstep.timetrack
 
 import java.time.LocalDate
 
-import de.digitalstep.timetrack.io._
+import de.digitalstep.timetrack.persistence._
+
+import scala.collection.mutable
 
 object Repository {
+
   def apply(): Repository = new Repository(Storage())
+
+  trait Observer {
+
+  }
+
 }
 
 class Repository(storage: Storage) {
 
+  sealed trait Change
+
+  case class Add(workUnit: WorkUnit) extends Change
+
+  class Subscription(op: Change ⇒ Unit) {
+    def cancel() = listeners -= op
+  }
+
+  private[this] def saveOnChange(c: Change): Unit = storage.save()
+
+  private[this] val listeners: mutable.ArrayBuffer[Change ⇒ Unit] = mutable.ArrayBuffer(saveOnChange)
+
   def add(workUnit: WorkUnit): Repository = {
     storage.add(workUnit.date, workUnit.toTask)
+    listeners foreach {
+      _.apply(Add(workUnit))
+    }
     this
+  }
+
+  def onChange(op: Change ⇒ Unit): Subscription = {
+    listeners += op
+    new Subscription(op)
   }
 
   def add(x: Traversable[WorkUnit]): Repository = x.foldLeft(this) {

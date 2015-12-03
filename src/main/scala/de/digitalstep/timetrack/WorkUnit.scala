@@ -2,7 +2,7 @@ package de.digitalstep.timetrack
 
 import java.time.{LocalTime, Duration, LocalDate, LocalDateTime}
 
-import de.digitalstep.timetrack.io.{Task, Day}
+import de.digitalstep.timetrack.persistence.{Task, Day}
 
 /**
   * A time frame with a label describing what work has been done.
