@@ -14,10 +14,12 @@ class RepositorySpecification extends PropertySpecification {
 
   private[this] def repository(data: List[Day]): Repository = new Repository(new Storage {
 
-    val sections: mutable.ListBuffer[Section] = mutable.ListBuffer() ++ data
+    val map: mutable.HashMap[LocalDate, List[Task]] = mutable.HashMap(data.map(d ⇒ d.date → d.tasks.toList): _*)
+
+    def days: Iterable[Day] = for ((date, tasks) ← map) yield Day(date, tasks.toSeq)
 
     def add(date: LocalDate, t: Task): Storage = {
-      sections += Day(date, Seq(t))
+      map.put(date, t :: map.getOrElse(date, Nil))
       this
     }
 
@@ -31,7 +33,9 @@ class RepositorySpecification extends PropertySpecification {
 
   property("findAll") {
     forAll { data: List[Day] ⇒
-      repository(data).findAll.map(_.toTask) should contain theSameElementsAs (data flatMap (_.tasks))
+      val actual = repository(data).findAll.map(_.toTask)
+      val expected = data.flatMap(_.tasks)
+      actual should contain theSameElementsAs expected
     }
   }
 

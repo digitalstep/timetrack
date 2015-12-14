@@ -9,9 +9,11 @@ class TextStorageSpecification extends PropertySpecification {
 
   import Generators.Implicits._
 
-  property("sections") {
-    forAll { data: InputText ⇒
-      new TextStorage(() ⇒ data.sections, mockSerializer).sections should contain theSameElementsAs data.sections
+  property("days") {
+    forAll { data: List[Day] ⇒
+      val dateSet = new TextStorage(() ⇒ data, mockSerializer).days.map(_.date).toSet
+      val expected = data.map(_.date).toSet
+      dateSet should contain theSameElementsAs expected
     }
   }
 
@@ -53,28 +55,26 @@ class TextStorageSpecification extends PropertySpecification {
 
   property("add") {
     forAll { (data: List[Day], date: LocalDate, task: Task) ⇒
-      new TextStorage(() ⇒ InputText(data).sections, mockSerializer).add(date, task).days.map(_.date) should contain(date)
+      val x = new TextStorage(() ⇒ InputText(data).sections, mockSerializer)
+      x.add(date, task)
+      x.days.map(_.date) should contain(date)
+      x.days should have size (date :: data.map(_.date)).toSet.size
     }
-
-    tested.add(testDate1, testTask2).days should contain(Day(testDate1, Seq(testTask2, testTask1)))
-    tested.add(testDate2, testTask1).days should contain(Day(testDate2, Seq(testTask1)))
   }
 
   property("save") {
     tested.save()
 
     mockSerializer.out.toString("UTF-8") shouldBe
-      """# -*-Text-*-
-        |2015-12-01
+      """2015-12-01
         |09:00 - 10:00   Test
         |
         |2015-11-30
         |09:00 - 10:00   Test
-        |11:00 - 12:00   Test
-        |
-        |""".stripMargin
+        |11:00 - 12:00   Test""".stripMargin +
+        "\n\n"
 
-        tested.sections should be (initialTestData)
+    tested.days should be(initialTestData.filter(_.isInstanceOf[Day]))
   }
 
 }

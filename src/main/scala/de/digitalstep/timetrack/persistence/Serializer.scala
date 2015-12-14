@@ -1,8 +1,10 @@
 package de.digitalstep.timetrack.persistence
 
-import java.io.{PrintWriter, OutputStream}
+import java.io.{OutputStream, PrintWriter}
 
-trait Serializer {
+import com.typesafe.scalalogging.LazyLogging
+
+trait Serializer extends LazyLogging {
 
   protected def outputStream(): OutputStream
 
@@ -11,7 +13,9 @@ trait Serializer {
   protected[persistence] def serialize(e: Element): Unit = {
     val writer = new PrintWriter(outputStream())
     try {
-      writer.println(toString(e))
+      val serialized = toString(e)
+      logger.debug(serialized)
+      writer.println(serialized)
     } finally {
       close(writer)
     }

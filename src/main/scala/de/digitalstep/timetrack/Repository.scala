@@ -2,6 +2,7 @@ package de.digitalstep.timetrack
 
 import java.time.LocalDate
 
+import com.typesafe.scalalogging.LazyLogging
 import de.digitalstep.timetrack.persistence._
 
 import scala.collection.mutable
@@ -10,13 +11,9 @@ object Repository {
 
   def apply(): Repository = new Repository(Storage())
 
-  trait Observer {
-
-  }
-
 }
 
-class Repository(storage: Storage) {
+class Repository(storage: Storage) extends LazyLogging {
 
   sealed trait Change
 
@@ -31,10 +28,11 @@ class Repository(storage: Storage) {
   private[this] val listeners: mutable.ArrayBuffer[Change ⇒ Unit] = mutable.ArrayBuffer(saveOnChange)
 
   def add(workUnit: WorkUnit): Repository = {
+    logger.debug("Adding {}", workUnit)
+    def notify(listener: Change ⇒ Unit) = listener(Add(workUnit))
+
     storage.add(workUnit.date, workUnit.toTask)
-    listeners foreach {
-      _.apply(Add(workUnit))
-    }
+    listeners foreach notify
     this
   }
 

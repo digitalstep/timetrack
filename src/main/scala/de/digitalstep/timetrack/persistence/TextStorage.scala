@@ -15,7 +15,7 @@ import scala.reflect.io.{File, Path}
 private[persistence] object TextStorage {
   private[this] implicit def path2string(path: Path): ParserInput = fromInputStream(File(path).inputStream()).mkString
 
-  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt"
+  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung-test.txt"
 
   def apply(): TextStorage = apply(path)
 
@@ -29,26 +29,33 @@ private[persistence] class TextStorage(
                                         input: () ⇒ Iterable[Section],
                                         output: Serializer) extends Storage with LazyLogging {
 
-  val sections: mutable.ListBuffer[Section] = mutable.ListBuffer() ++ input()
+  val dayMap: mutable.Map[LocalDate, Seq[Task]] = mutable.Map() ++
+    input().
+      filter(_.isInstanceOf[Day]).
+      map(_.asInstanceOf[Day]).
+      map(d ⇒ d.date → d.tasks)
 
-  def findDay(date: LocalDate): Option[Day] =
-    sections.
-      find(x ⇒ x.isInstanceOf[Day] && x.asInstanceOf[Day].date == date).
-      map(_.asInstanceOf[Day])
+  def days: Iterable[Day] = for ((date, tasks) ← dayMap) yield Day(date, tasks)
+
+  def findDay(date: LocalDate): Option[Day] = dayMap.get(date).map(t ⇒ Day(date, t))
 
   def save(): Unit = {
-    sections foreach output.serialize
-    sections.clear()
-    sections ++= input()
+    logger.debug("Saving to ()", output)
+    for ((date, tasks) ← dayMap) {
+      output.serialize(Day(date, tasks.toSeq))
+    }
+
+    dayMap.clear()
+    dayMap ++= input()
+      .filter(_.isInstanceOf[Day])
+      .map(_.asInstanceOf[Day])
+      .map(d ⇒ d.date → d.tasks)
+
   }
 
   def add(date: LocalDate, task: Task): Storage = {
-    val index = sections.indexWhere(s ⇒ s.isInstanceOf[Day] && s.asInstanceOf[Day].date == date)
-    logger.debug("Found entry with date {} at index {}", date, new Integer(index))
-    index match {
-      case -1 ⇒ sections += Day(date, Seq(task))
-      case x ⇒ sections(x) = Day(date, task :: sections(x).asInstanceOf[Day].tasks.toList)
-    }
+    dayMap.put(date, task :: dayMap.getOrElse(date, Seq()).toList)
+    logger.debug("Storage now holds {} sections", new Integer(dayMap.keys.size))
     this
   }
 }

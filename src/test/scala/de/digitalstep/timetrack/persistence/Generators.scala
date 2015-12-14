@@ -2,10 +2,9 @@ package de.digitalstep.timetrack.persistence
 
 import java.time.{LocalDate, LocalTime}
 
-import de.digitalstep.timetrack.persistence.Generators._
 import org.scalacheck.Arbitrary._
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Gen._
+import org.scalacheck.{Arbitrary, Gen}
 
 private[timetrack] object Generators extends Generators
 
@@ -25,10 +24,10 @@ trait Generators {
   val genDescription = arbitrary[String]
 
   val genTask = for {
-    from ← genTime
-    to ← genTime
+    x ← genTime
+    y ← genTime
     desc ← genDescription
-  } yield Task(from, to, desc)
+  } yield if (y isBefore x) Task(y, x, "a") else Task(x, y, "a")
 
   def genDay: Gen[Day] = genDay(genTask)
 
@@ -37,21 +36,21 @@ trait Generators {
     tasks ← containerOf[List, Task](task)
   } yield Day(date, tasks)
 
-  val genDays = containerOf[List, Day](genDay)
+  val genDayMap = mapOf[LocalDate, Seq[Task]](for {
+    date ← genDate
+    tasks ← containerOf[Seq, Task](genTask)
+  } yield (date, tasks))
 
-  val genComment = for {
-    text ← arbitrary[String]
-  } yield Comment(text)
+  val genDays = genDayMap.map {
+    _.toList.map { f ⇒
+      Day(f._1, f._2)
+    }
+  }
 
-  val genData = containerOf[List, Section](oneOf(genDay, genComment))
-
-  val genInputText = for {
-    data ← genData
-  } yield InputText(data)
+  val genInputText = genDays.map(InputText.apply)
 
   object Implicits {
     implicit val arbitraryInput = Arbitrary(genInputText)
-    implicit val arbitraryData = Arbitrary(genData)
     implicit val arbitraryDays = Arbitrary(genDays)
     implicit val arbitraryDate = Arbitrary(genDate)
     implicit val arbitraryTask = Arbitrary(genTask)
