@@ -1,6 +1,5 @@
 package de.digitalstep.timetrack.persistence
 
-import java.io.OutputStream
 import java.time._
 
 import com.typesafe.scalalogging.LazyLogging
@@ -21,7 +20,7 @@ private[persistence] object TextStorage {
 
   def apply(path: Path): TextStorage = new TextStorage(
     () ⇒ InputParser(path).sections,
-    FileSerializer(path))
+    Serializer(path))
 
 }
 
@@ -40,7 +39,7 @@ private[persistence] class TextStorage(
   def findDay(date: LocalDate): Option[Day] = dayMap.get(date).map(t ⇒ Day(date, t))
 
   def save(): Unit = {
-    logger.debug("Saving to ()", output)
+    logger.debug("Saving to {}", output)
     for ((date, tasks) ← dayMap) {
       output.serialize(Day(date, tasks.toSeq))
     }

@@ -11,19 +11,24 @@ object Repository {
 
   def apply(): Repository = new Repository(Storage())
 
+  sealed trait Change
+
+  case class Add(workUnit: WorkUnit) extends Change
+
 }
 
 class Repository(storage: Storage) extends LazyLogging {
 
-  sealed trait Change
-
-  case class Add(workUnit: WorkUnit) extends Change
+  import Repository._
 
   class Subscription(op: Change ⇒ Unit) {
     def cancel() = listeners -= op
   }
 
-  private[this] def saveOnChange(c: Change): Unit = storage.save()
+  private[this] def saveOnChange(c: Change): Unit = {
+    logger.debug("Saving because of {}", c)
+    storage.save()
+  }
 
   private[this] val listeners: mutable.ArrayBuffer[Change ⇒ Unit] = mutable.ArrayBuffer(saveOnChange)
 

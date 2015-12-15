@@ -4,6 +4,22 @@ import java.io.{OutputStream, PrintWriter}
 
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.reflect.io.Path
+
+object Serializer {
+
+  def apply(path: Path): Serializer = new Serializer {
+    protected def outputStream() = path.toFile.outputStream()
+  }
+
+  def apply(out: OutputStream) = new Serializer {
+    protected def outputStream(): OutputStream = out
+
+    override protected def close(out: AutoCloseable): Unit = {}
+  }
+
+}
+
 trait Serializer extends LazyLogging {
 
   protected def outputStream(): OutputStream
