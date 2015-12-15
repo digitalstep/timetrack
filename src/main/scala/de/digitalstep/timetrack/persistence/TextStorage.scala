@@ -40,9 +40,12 @@ private[persistence] class TextStorage(
 
   def save(): Unit = {
     logger.debug("Saving to {}", output)
-    for ((date, tasks) ← dayMap) {
-      output.serialize(Day(date, tasks.toSeq))
-    }
+    InputText(dayMap.toSeq.map(entry ⇒ Day(entry._1, entry._2)))
+    output.serialize(
+      InputText(
+        for ((date, tasks) ← dayMap) yield Day(date, tasks)
+      )
+    )
 
     dayMap.clear()
     dayMap ++= input()

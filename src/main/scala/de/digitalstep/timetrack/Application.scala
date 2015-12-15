@@ -2,6 +2,7 @@ package de.digitalstep.timetrack
 
 import java.util.Locale
 
+import com.typesafe.scalalogging.LazyLogging
 import ui._
 
 import scala.language.implicitConversions
@@ -13,14 +14,10 @@ import scalafx.scene.Scene
 import scalafx.scene.control._
 import scalafx.scene.layout.BorderPane
 
-object Application extends JFXApp {
+object Application extends JFXApp with LazyLogging {
   Locale.setDefault(Locale.GERMANY)
 
   private[this] val repository = Repository()
-  repository.onChange(change ⇒ {
-    println(change)
-    println(repository.findAll.mkString)
-  })
 
   private[this] val workUnits: ObservableBuffer[WorkUnitAdapter] =
     ObservableBuffer(repository.findAll.map(WorkUnitAdapter.apply).toSeq)
@@ -28,7 +25,7 @@ object Application extends JFXApp {
   workUnits.onChange((buffer, changes) ⇒ for (change ← changes) {
     change match {
       case Add(_, added: Traversable[WorkUnitAdapter]) ⇒ repository.add(added.map(_.get))
-      case x ⇒ println(x)
+      case x ⇒ logger.debug("Change not handled {}", x);
     }
   })
 
