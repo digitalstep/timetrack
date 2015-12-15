@@ -14,7 +14,7 @@ import scala.reflect.io.{File, Path}
 private[persistence] object TextStorage {
   private[this] implicit def path2string(path: Path): ParserInput = fromInputStream(File(path).inputStream()).mkString
 
-  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung-test.txt"
+  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt"
 
   def apply(): TextStorage = apply(path)
 
@@ -26,7 +26,8 @@ private[persistence] object TextStorage {
 
 private[persistence] class TextStorage(
                                         input: () ⇒ Iterable[Section],
-                                        output: Serializer) extends Storage with LazyLogging {
+                                        output: Serializer)
+  extends Storage with LazyLogging {
 
   val dayMap: mutable.Map[LocalDate, Seq[Task]] = mutable.Map() ++
     input().
