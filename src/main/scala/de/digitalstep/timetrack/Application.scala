@@ -27,5 +27,5 @@ object Application extends JFXApp with LazyLogging {
   })
 
   stage = ui.PrimaryStage(workUnits)
-  ui.TrayIconStuff(stage)
+  ui.StageTrayIcon(stage)
 }
