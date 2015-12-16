@@ -2,6 +2,8 @@ package de.digitalstep.timetrack.ui
 
 import java.time.{LocalTime, LocalDate}
 
+import de.digitalstep.timetrack.ui.converters.{LocalTimeStringConverter, LocalDateStringConverter}
+
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{TableColumn, TableView}
@@ -20,7 +22,7 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView
   )
 
   private[this] def dateColumn(text: String, property: CellValueFactory[LocalDate]) =
-    column(text, property, LocalDateStringConverter.shortFormatStyle)
+    column(text, property, LocalDateStringConverter.short)
 
   private[this] def timeColumn(text: String, property: CellValueFactory[LocalTime]) =
     column(text, property, LocalTimeStringConverter.short)

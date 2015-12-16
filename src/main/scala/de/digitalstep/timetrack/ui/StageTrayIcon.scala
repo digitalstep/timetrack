@@ -7,7 +7,6 @@ import javax.imageio.ImageIO
 import javax.swing.SwingUtilities
 
 import com.typesafe.scalalogging.LazyLogging
-import sun.security.pkcs11.wrapper.CK_C_INITIALIZE_ARGS
 
 import scalafx.application.Platform
 import scalafx.stage.Stage
@@ -67,11 +66,9 @@ object Build {
 }
 
 trait Runnables {
-
   protected implicit def runnable(f: () ⇒ Unit): Runnable = new Runnable {
     def run() = f()
   }
-
 }
 
 trait ImplicitActionListeners {

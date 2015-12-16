@@ -1,4 +1,4 @@
-package de.digitalstep.timetrack.ui
+package de.digitalstep.timetrack.ui.converters
 
 import java.time.LocalDate
 import java.time.format.{DateTimeFormatter, FormatStyle}
@@ -6,14 +6,10 @@ import java.time.format.{DateTimeFormatter, FormatStyle}
 import scalafx.util.StringConverter
 
 object LocalDateStringConverter {
-
-  def shortFormatStyle: LocalDateStringConverter = new LocalDateStringConverter(FormatStyle.SHORT)
-
-  def localDateFromString(style: FormatStyle)(localDate: String) =
-    LocalDate.parse(localDate, DateTimeFormatter.ofLocalizedDate(style))
+  def short: LocalDateStringConverter = new LocalDateStringConverter(FormatStyle.SHORT)
 }
 
-class LocalDateStringConverter(style: FormatStyle) extends StringConverter[LocalDate] {
+class LocalDateStringConverter private(style: FormatStyle) extends StringConverter[LocalDate] {
 
   private[this] val formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(style)
 

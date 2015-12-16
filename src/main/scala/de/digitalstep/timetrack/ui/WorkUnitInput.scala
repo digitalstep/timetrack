@@ -1,6 +1,8 @@
 package de.digitalstep.timetrack.ui
 
 import java.time.LocalDate
+import de.digitalstep.timetrack.ui.converters.LocalTimeStringConverter
+
 import scalafx.scene.control.{TextFormatter, DatePicker, Label, TextField}
 
 trait WorkUnitInput {
