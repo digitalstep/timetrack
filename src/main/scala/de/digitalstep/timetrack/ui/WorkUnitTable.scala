@@ -1,18 +1,18 @@
 package de.digitalstep.timetrack.ui
 
-import java.time.{LocalTime, LocalDate}
+import java.time.{LocalDate, LocalTime}
 
-import de.digitalstep.timetrack.ui.converters.{LocalTimeStringConverter, LocalDateStringConverter}
+import de.digitalstep.timetrack.ui.converters.{LocalDateStringConverter, LocalTimeStringConverter}
 
+import scalafx.Includes._
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
-import scalafx.scene.control.{TableColumn, TableView}
+import scalafx.event.ActionEvent
+import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
-class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView[WorkUnitAdapter] {
-
-  type CellValueFactory[T] = TableColumn.CellDataFeatures[WorkUnitAdapter, String] => ObservableValue[T, T]
-  type WorkUnitColumn = TableColumn[WorkUnitAdapter, String]
+class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView[WorkUnitAdapter] with ColumnFactory {
+  items = buffer
 
   columns ++= Seq(
     dateColumn("Date", _.value.dayProperty),
@@ -21,14 +21,30 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView
     stringColumn("Description", _.value.descriptionProperty)
   )
 
-  private[this] def dateColumn(text: String, property: CellValueFactory[LocalDate]) =
+  private[this] val editItem = new MenuItem {
+    text = "Edit"
+    onAction = (e: ActionEvent) ⇒ {
+      val dialog = new EditWorkUnitDialog(WorkUnitAdapter())
+      dialog.showAndWait()
+    }
+  }
+  private[this] val removeItem = new MenuItem("Remove")
+
+  contextMenu = new ContextMenu(editItem, removeItem)
+}
+
+trait ColumnFactory {
+  type CellValueFactory[T] = TableColumn.CellDataFeatures[WorkUnitAdapter, String] => ObservableValue[T, T]
+
+  type WorkUnitColumn = TableColumn[WorkUnitAdapter, String]
+
+  protected[this] def dateColumn(text: String, property: CellValueFactory[LocalDate]) =
     column(text, property, LocalDateStringConverter.short)
 
-  private[this] def timeColumn(text: String, property: CellValueFactory[LocalTime]) =
+  protected[this] def timeColumn(text: String, property: CellValueFactory[LocalTime]) =
     column(text, property, LocalTimeStringConverter.short)
 
-
-  private[this] def stringColumn(_text: String, observable: CellValueFactory[String]): WorkUnitColumn = new WorkUnitColumn {
+  protected[this] def stringColumn(_text: String, observable: CellValueFactory[String]): WorkUnitColumn = new WorkUnitColumn {
     text = _text
     cellValueFactory = x ⇒ observable(x)
   }
@@ -41,5 +57,5 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView
       cellValueFactory = x ⇒ StringBinding(observable(x), converter)
     }
 
-  items = buffer
+
 }

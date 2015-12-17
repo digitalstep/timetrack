@@ -2,7 +2,8 @@ package de.digitalstep.timetrack.ui
 
 import scalafx.Includes._
 import scalafx.scene.Node
-import scalafx.scene.control.{ButtonType, Dialog}
+import scalafx.scene.control.ButtonType.{Cancel, OK}
+import scalafx.scene.control.Dialog
 import scalafx.scene.layout.GridPane
 
 class EditWorkUnitDialog(val workUnit: WorkUnitAdapter) extends Dialog[WorkUnitAdapter] with WorkUnitInput {
@@ -12,29 +13,24 @@ class EditWorkUnitDialog(val workUnit: WorkUnitAdapter) extends Dialog[WorkUnitA
     hgap = 5
     vgap = 5
 
-    val constraints: Seq[(Node, Node)] = Seq(
+    val nodes: Seq[(Node, Node)] = Seq(
       (dayLabel, dayInput),
       (fromLabel, fromText),
       (toLabel, toText),
       (descriptionLabel, descriptionText)
     )
 
-    for ((y, (left, right)) ← (0 to constraints.size) zip constraints) {
+    for ((y, (left, right)) ← (0 to nodes.size) zip nodes) {
       GridPane.setConstraints(left, 0, y)
       GridPane.setConstraints(right, 1, y)
     }
 
-    children = Seq(
-      dayLabel, dayInput,
-      fromLabel, fromText,
-      toLabel, toText,
-      descriptionLabel, descriptionText
-    )
+    children = nodes.flatMap(tuple ⇒ Seq(tuple._1, tuple._2))
   }
 
-  dialogPane().buttonTypes = Seq(ButtonType.OK, ButtonType.Cancel)
+  dialogPane().buttonTypes = Seq(OK, Cancel)
   resultConverter = {
-    case ButtonType.OK ⇒ workUnit
+    case OK ⇒ workUnit
     case _ ⇒ null
   }
 
