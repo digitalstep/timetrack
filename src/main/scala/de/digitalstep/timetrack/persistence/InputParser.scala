@@ -25,20 +25,16 @@ class InputParser(val input: ParserInput) extends Parser {
   }
 
   def sections = rule {
-    section.* ~> InputText
+    day.* ~> InputText
   }
 
-  def section: Rule1[Section] = rule {
-    day | comment
-  }
-
-  def day: Rule1[Section] = rule {
+  def day: Rule1[Day] = rule {
     isoDate ~ nl.+ ~ tasks ~ zeroOrMore("\n") ~> Day
   }
 
   def isoDate = rule {
     isoYear ~ "-" ~ isoMonth ~ "-" ~ isoDayOfMonth ~> { (y, m, d) ⇒
-      LocalDate.of(y, m, d)
+      date(y, m, d)
     }
   }
 
