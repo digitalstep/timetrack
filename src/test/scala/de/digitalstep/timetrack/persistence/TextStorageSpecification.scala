@@ -19,8 +19,8 @@ class TextStorageSpecification extends PropertySpecification {
 
   property("findDay") {
     forAll { data: InputText ⇒
-      data.sections foreach {
-        case day@Day(date, _) ⇒ new TextStorage(() ⇒ data.sections, mockSerializer).findDay(date).map(_.date) should be(Some(date))
+      data.days foreach {
+        case day@Day(date, _) ⇒ new TextStorage(() ⇒ data.days, mockSerializer).findDay(date).map(_.date) should be(Some(date))
         case _ ⇒ // nothing to verify
       }
     }
@@ -40,7 +40,6 @@ class TextStorageSpecification extends PropertySpecification {
   }
 
   val initialTestData = List(
-    Comment("-*-Text-*-"),
     Day(testDate1, Seq(
       testTask1)),
     Day(date(2015, 11, 30), Seq(
@@ -55,7 +54,7 @@ class TextStorageSpecification extends PropertySpecification {
 
   property("add") {
     forAll { (data: List[Day], date: LocalDate, task: Task) ⇒
-      val x = new TextStorage(() ⇒ InputText(data).sections, mockSerializer)
+      val x = new TextStorage(() ⇒ InputText(data).days, mockSerializer)
       x.add(date, task)
       x.days.map(_.date) should contain(date)
       x.days should have size (date :: data.map(_.date)).toSet.size

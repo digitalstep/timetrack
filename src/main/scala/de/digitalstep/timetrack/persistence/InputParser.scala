@@ -86,10 +86,6 @@ class InputParser(val input: ParserInput) extends Parser {
     capture((!eol ~ ANY).+)
   }
 
-  def comment: Rule1[Comment] = rule {
-    "#" ~ capture((!eol ~ ANY).*) ~ eol ~> Comment
-  }
-
   def ws = rule {
     anyOf(" \n\r\t\f").+
   }

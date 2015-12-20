@@ -6,18 +6,12 @@ sealed trait Element {
   val hasChildren: Boolean
 }
 
-sealed trait Section extends Element
-
-case class InputText(sections: Iterable[Section]) extends Element {
+case class InputText(days: Iterable[Day]) extends Element {
   val hasChildren = true
 }
 
-case class Day(date: LocalDate, tasks: Seq[Task]) extends Section {
+case class Day(date: LocalDate, tasks: Seq[Task]) extends Element {
   val hasChildren = true
-}
-
-case class Comment(text: String) extends Section {
-  val hasChildren = false
 }
 
 case class Task(from: LocalTime, to: LocalTime, name: String) extends Element {

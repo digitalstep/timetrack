@@ -7,16 +7,12 @@ import de.digitalstep.timetrack.test.UnitSpec
 
 class InputParserSpec extends UnitSpec {
 
-  "A comment" should "be parsed" in {
-    new InputParser("#asdf").comment.run().get shouldEqual Comment("asdf")
-  }
-
   import CompleteFiles._
 
   "A simple timesheet" should "be parsed" in {
     val days: InputText = new InputParser(simple).all.run().get
 
-    days.sections.head shouldEqual Day(
+    days.days.head shouldEqual Day(
       LocalDate.of(2015, 11, 16),
       Seq(
         Task(Time(9, 45), Time(12, 0), "Coding")
@@ -26,7 +22,7 @@ class InputParserSpec extends UnitSpec {
 
   it should "handle multiple top level elements" in {
     val days: InputText = new InputParser(multipleSectionsWithComment).all.run().get
-    val s1 :: s2 :: Nil = days.sections.toList
+    val s1 :: s2 :: Nil = days.days.toList
 
     s1 shouldEqual Day(
       date(2015, 11, 16),

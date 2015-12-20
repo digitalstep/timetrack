@@ -19,21 +19,18 @@ private[persistence] object TextStorage {
   def apply(): TextStorage = apply(path)
 
   def apply(path: Path): TextStorage = new TextStorage(
-    () ⇒ InputParser(path).sections,
+    () ⇒ InputParser(path).days,
     Serializer(path))
 
 }
 
 private[persistence] class TextStorage(
-                                        input: () ⇒ Iterable[Section],
+                                        input: () ⇒ Iterable[Day],
                                         output: Serializer)
   extends Storage with LazyLogging {
 
   val dayMap: mutable.Map[LocalDate, Seq[Task]] = mutable.Map() ++
-    input().
-      filter(_.isInstanceOf[Day]).
-      map(_.asInstanceOf[Day]).
-      map(d ⇒ d.date → d.tasks)
+    input().map(d ⇒ d.date → d.tasks)
 
   def days: Iterable[Day] = for ((date, tasks) ← dayMap) yield Day(date, tasks)
 
@@ -49,11 +46,7 @@ private[persistence] class TextStorage(
     )
 
     dayMap.clear()
-    dayMap ++= input()
-      .filter(_.isInstanceOf[Day])
-      .map(_.asInstanceOf[Day])
-      .map(d ⇒ d.date → d.tasks)
-
+    dayMap ++= input().map(d ⇒ d.date → d.tasks)
   }
 
   def add(date: LocalDate, task: Task): Storage = {
