@@ -7,7 +7,6 @@ import de.digitalstep.timetrack.ui.converters.{LocalDateStringConverter, LocalTi
 import scalafx.Includes._
 import scalafx.beans.value.ObservableValue
 import scalafx.collections.ObservableBuffer
-import scalafx.event.ActionEvent
 import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
@@ -21,16 +20,15 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView
     stringColumn("Description", _.value.descriptionProperty)
   )
 
-  private[this] val editItem = new MenuItem {
-    text = "Edit"
-    onAction = (e: ActionEvent) ⇒ {
-      val dialog = new EditWorkUnitDialog(WorkUnitAdapter())
-      dialog.showAndWait()
-    }
-  }
-  private[this] val removeItem = new MenuItem("Remove")
-
   contextMenu = new ContextMenu(editItem, removeItem)
+
+  private[this] lazy val editItem = new MenuItem {
+    text = "Edit"
+    onAction = () ⇒ EditWorkUnitDialog.update(selectionModel.value.selectedItems.head, buffer)
+  }
+
+  private[this] lazy val removeItem = new MenuItem("Remove")
+
 }
 
 trait ColumnFactory {

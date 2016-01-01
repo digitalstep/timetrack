@@ -21,16 +21,21 @@ class Repository(storage: Storage) extends LazyLogging {
 
   import Repository._
 
-  class Subscription(op: Change ⇒ Unit) {
-    def cancel() = listeners -= op
-  }
-
-  private[this] def saveOnChange(c: Change): Unit = {
+  private[this] val listeners: mutable.ArrayBuffer[Change ⇒ Unit] = mutable.ArrayBuffer() += (c ⇒ {
     logger.debug("Saving because of {}", c)
     storage.save()
+  })
+
+  def findAll: Iterable[WorkUnit] = {
+    val tasks = for (d ← storage.days; t ← d.tasks) yield WorkUnit(d, t)
+    tasks.toSeq.sorted.reverse
   }
 
-  private[this] val listeners: mutable.ArrayBuffer[Change ⇒ Unit] = mutable.ArrayBuffer(saveOnChange)
+  def findDays: Map[LocalDate, Iterable[WorkUnit]] = findAll groupBy (_.date)
+
+  def add(x: Traversable[WorkUnit]): Repository = x.foldLeft(this) {
+    _ add _
+  }
 
   def add(workUnit: WorkUnit): Repository = {
     logger.debug("Adding {}", workUnit)
@@ -46,15 +51,8 @@ class Repository(storage: Storage) extends LazyLogging {
     new Subscription(op)
   }
 
-  def add(x: Traversable[WorkUnit]): Repository = x.foldLeft(this) {
-    _ add _
+  class Subscription(op: Change ⇒ Unit) {
+    def cancel() = listeners -= op
   }
-
-  def findAll: Iterable[WorkUnit] = {
-    val tasks = for (d ← storage.days; t ← d.tasks) yield WorkUnit(d, t)
-    tasks.toSeq.sorted.reverse
-  }
-
-  def findDays: Map[LocalDate, Iterable[WorkUnit]] = findAll groupBy (_.date)
 
 }

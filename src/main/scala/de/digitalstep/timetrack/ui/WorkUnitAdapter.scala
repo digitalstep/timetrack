@@ -1,12 +1,12 @@
 package de.digitalstep.timetrack.ui
 
-import java.time.temporal.{ChronoUnit, TemporalUnit}
+import java.time.temporal.ChronoUnit
 
 import de.digitalstep.timetrack.WorkUnit
 
 import scalafx.beans.property.{ObjectProperty, StringProperty}
 
-class WorkUnitAdapter(workUnit: WorkUnit) {
+class WorkUnitAdapter(private val workUnit: WorkUnit) {
 
   import workUnit._
 
@@ -21,6 +21,11 @@ class WorkUnitAdapter(workUnit: WorkUnit) {
     toProperty.value,
     descriptionProperty.value
   )
+
+  override def equals(other: Any): Boolean = other match {
+    case that: WorkUnitAdapter ⇒ this.workUnit == that.workUnit
+    case _ ⇒ false
+  }
 
 }
 

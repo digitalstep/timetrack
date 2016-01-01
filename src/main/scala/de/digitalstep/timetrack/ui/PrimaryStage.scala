@@ -9,40 +9,34 @@ import scalafx.scene.layout.BorderPane
 
 object PrimaryStage {
 
-  def apply(workUnits: ObservableBuffer[WorkUnitAdapter]): JFXApp.PrimaryStage = new JFXApp.PrimaryStage {
-    title = "timetrack"
-    scene = new Scene {
-      root = new BorderPane {
+  def apply(workUnits: ObservableBuffer[WorkUnitAdapter]): JFXApp.PrimaryStage =
+    new JFXApp.PrimaryStage {
+      title = "timetrack"
+      scene = new Scene {
+        root = new BorderPane {
 
-        top = toolbar(workUnits)
+          top = toolbar(workUnits)
 
-        center = new TabPane {
-          tabs = Seq(
-            new Tab {
-              text = "Erfassung"
-              content = new WorkUnitTable(workUnits)
-            }
-          )
+          center = new TabPane {
+            tabs = Seq(
+              new Tab {
+                text = "Erfassung"
+                content = workUnitTable(workUnits)
+              }
+            )
+          }
         }
       }
     }
-  }
+
+  private[this] def workUnitTable(workUnits: ObservableBuffer[WorkUnitAdapter]): WorkUnitTable =
+    new WorkUnitTable(workUnits)
 
   private[this] def toolbar(workUnits: ObservableBuffer[WorkUnitAdapter]) = new ToolBar {
     content = Seq(
       new Button {
         text = "+"
-        onAction = { () ⇒ {
-          val dialog = new EditWorkUnitDialog(WorkUnitAdapter())
-          dialog.showAndWait() match {
-            case Some(_) ⇒ {
-              workUnits.add(dialog.getResult)
-              workUnits.sort((a, b) ⇒ a.get > b.get)
-            }
-            case _ ⇒ println("Cancelled")
-          }
-        }
-        }
+        onAction = { () ⇒ EditWorkUnitDialog.create(workUnits) }
       }
     )
   }
