@@ -27,6 +27,8 @@ class WorkUnitAdapter(private val workUnit: WorkUnit) {
     case _ ⇒ false
   }
 
+  override def hashCode: Int = workUnit.hashCode()
+
 }
 
 object WorkUnitAdapter {
