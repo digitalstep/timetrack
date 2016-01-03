@@ -29,28 +29,28 @@ private[persistence] class TextStorage(
                                         output: Serializer)
   extends Storage with LazyLogging {
 
-  val dayMap: mutable.Map[LocalDate, Seq[Task]] = mutable.Map() ++
-    input().map(d ⇒ d.date → d.tasks)
+  val dayMap: mutable.Map[LocalDate, Set[Task]] = mutable.Map() ++
+    input().map(d ⇒ d.date → d.tasks.toSet)
 
-  def days: Iterable[Day] = for ((date, tasks) ← dayMap) yield Day(date, tasks)
+  def days: Iterable[Day] = for ((date, tasks) ← dayMap) yield Day(date, tasks.toSeq)
 
-  def findDay(date: LocalDate): Option[Day] = dayMap.get(date).map(t ⇒ Day(date, t))
+  def findDay(date: LocalDate): Option[Day] = dayMap.get(date).map(t ⇒ Day(date, t.toSeq))
 
   def save(): Unit = {
     logger.debug("Saving to {}", output)
-    InputText(dayMap.toSeq.map(entry ⇒ Day(entry._1, entry._2)))
+    InputText(dayMap.toSeq.map(entry ⇒ Day(entry._1, entry._2.toSeq)))
     output.serialize(
       InputText(
-        for ((date, tasks) ← dayMap) yield Day(date, tasks)
+        for ((date, tasks) ← dayMap) yield Day(date, tasks.toSeq)
       )
     )
 
     dayMap.clear()
-    dayMap ++= input().map(d ⇒ d.date → d.tasks)
+    dayMap ++= input().map(d ⇒ d.date → d.tasks.toSet)
   }
 
   def add(date: LocalDate, task: Task): Storage = {
-    dayMap.put(date, task :: dayMap.getOrElse(date, Seq()).toList)
+    dayMap.put(date, dayMap.getOrElse(date, Set()) + task)
     logger.debug("Storage now holds {} sections", new Integer(dayMap.keys.size))
     this
   }
