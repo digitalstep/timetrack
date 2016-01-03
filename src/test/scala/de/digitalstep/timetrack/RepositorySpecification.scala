@@ -23,6 +23,11 @@ class RepositorySpecification extends PropertySpecification {
       this
     }
 
+    def delete(date: LocalDate, t: Task): Storage = {
+      map.put(date, map(date).filterNot(x ⇒ x == t))
+      this
+    }
+
     def save(): Unit = {}
   })
 

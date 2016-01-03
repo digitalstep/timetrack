@@ -6,6 +6,8 @@ trait TaskSink {
 
   def add(date: LocalDate, t: Task): TaskSink
 
+  def delete(date: LocalDate, t: Task): TaskSink
+
   def save(): Unit
 
 }

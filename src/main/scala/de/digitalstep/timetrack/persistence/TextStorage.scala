@@ -38,11 +38,12 @@ private[persistence] class TextStorage(
 
   def save(): Unit = {
     logger.debug("Saving to {}", output)
-    InputText(dayMap.toSeq.map(entry ⇒ Day(entry._1, entry._2.toSeq)))
+
     output.serialize(
       InputText(
-        for ((date, tasks) ← dayMap) yield Day(date, tasks.toSeq)
-      )
+        for {
+          (date, tasks) ← dayMap.toSeq.sortBy(_._1)
+        } yield Day(date, tasks.toSeq.sortBy(_.from)))
     )
 
     dayMap.clear()
@@ -52,6 +53,11 @@ private[persistence] class TextStorage(
   def add(date: LocalDate, task: Task): Storage = {
     dayMap.put(date, dayMap.getOrElse(date, Set()) + task)
     logger.debug("Storage now holds {} sections", new Integer(dayMap.keys.size))
+    this
+  }
+
+  def delete(date: LocalDate, task: Task): Storage = {
+    dayMap.put(date, dayMap(date) - task)
     this
   }
 }

@@ -15,6 +15,8 @@ object Repository {
 
   case class Add(workUnit: WorkUnit) extends Change
 
+  case class Delete(workUnit: WorkUnit) extends Change
+
 }
 
 class Repository(storage: Storage) extends LazyLogging {
@@ -42,6 +44,19 @@ class Repository(storage: Storage) extends LazyLogging {
     def notify(listener: Change ⇒ Unit) = listener(Add(workUnit))
 
     storage.add(workUnit.date, workUnit.toTask)
+    listeners foreach notify
+    this
+  }
+
+  def delete(x: Traversable[WorkUnit]): Repository = x.foldLeft(this) {
+    _ delete _
+  }
+
+  def delete(workUnit: WorkUnit): Repository = {
+    logger.debug("Removing {}", workUnit)
+    def notify(listener: Change ⇒ Unit) = listener(Delete(workUnit))
+
+    storage.delete(workUnit.date, workUnit.toTask)
     listeners foreach notify
     this
   }

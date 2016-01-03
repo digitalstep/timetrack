@@ -39,7 +39,7 @@ class InputParser(val input: ParserInput) extends Parser {
   }
 
   def isoYear = rule {
-    capture("2015") ~> (_.toInt)
+    capture("201" ~ CharPredicate.Digit) ~> (_.toInt)
   }
 
   def isoMonth = rule {

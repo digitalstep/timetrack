@@ -24,10 +24,17 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView
 
   private[this] lazy val editItem = new MenuItem {
     text = "Edit"
-    onAction = () ⇒ EditWorkUnitDialog.update(selectionModel.value.selectedItems.head, buffer)
+    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, buffer)
   }
 
-  private[this] lazy val removeItem = new MenuItem("Remove")
+  def firstSelected: WorkUnitAdapter = {
+    selectionModel.value.selectedItems.head
+  }
+
+  private[this] lazy val removeItem = new MenuItem{
+    text = "Remove"
+    onAction = () ⇒ buffer -= firstSelected
+  }
 
 }
 
