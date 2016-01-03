@@ -6,4 +6,4 @@ object Storage {
 
 }
 
-trait Storage extends SectionSource with TaskSink
+trait Storage extends DaySource with TaskSink

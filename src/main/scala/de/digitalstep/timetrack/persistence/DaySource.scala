@@ -1,6 +1,6 @@
 package de.digitalstep.timetrack.persistence
 
-trait SectionSource {
+trait DaySource {
 
   def days: Iterable[Day]
 
