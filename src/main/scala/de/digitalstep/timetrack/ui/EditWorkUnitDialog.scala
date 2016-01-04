@@ -14,7 +14,9 @@ object EditWorkUnitDialog {
   }
 
   def update(adapter: WorkUnitAdapter, workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
-    edit(adapter)(x ⇒ workUnits.replaceAll(x, x))
+    edit(adapter) { x ⇒
+      workUnits.replaceAll(x, x)
+    }
 
   private[this] def edit(adapter: WorkUnitAdapter)(fn: WorkUnitAdapter ⇒ Unit): Unit = {
     val dialog = new EditWorkUnitDialog(adapter)

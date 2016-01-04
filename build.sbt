@@ -2,10 +2,18 @@ name := "timetrack"
 version := "1.0"
 isSnapshot := true
 
+packageSummary in Linux := "Time Tracking"
+packageDescription := "A simple tool with a journal to track time spent on projects"
+
+maintainer := "Gunnar Bastkowski <gunnar@digitalstep.de>"
+
 scalaVersion := "2.11.7"
 crossScalaVersions := Seq("2.11.7")
 
 mainClass := Some("de.digitalstep.timetrack.Application")
+
+enablePlugins(JavaAppPackaging)
+enablePlugins(JDKPackagerPlugin)
 
 libraryDependencies ++= Seq(
   "org.parboiled" %% "parboiled" % "2.1.0",
