@@ -9,12 +9,25 @@ import scala.collection.mutable
 import scala.io.Source.fromInputStream
 import scala.language.implicitConversions
 import scala.reflect.io.Path.string2path
-import scala.reflect.io.{File, Path}
+import scala.reflect.io.{Directory, File, Path}
 
 private[persistence] object TextStorage {
-  private[this] implicit def path2string(path: Path): ParserInput = fromInputStream(File(path).inputStream()).mkString
+  private[this] implicit def path2string(path: Path): ParserInput = {
+    val file = File(path)
+    if (!file.exists) {
+      file.parent.createDirectory()
+      file.createFile()
+      file.writeAll("")
+    } else {
+      if (file.isDirectory) throw new IllegalArgumentException(s"$path is a directory.")
+      if (!file.canWrite) throw new IllegalArgumentException(s"$path is not writeable")
+      if (!file.canRead) throw new IllegalArgumentException(s"$path is not readable")
+    }
 
-  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt"
+    fromInputStream(file.inputStream()).mkString
+  }
+
+  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung2.txt"
 
   def apply(): TextStorage = apply(path)
 
