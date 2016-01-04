@@ -1,5 +1,5 @@
 name := "timetrack"
-version := "1.0"
+version := "0.1"
 isSnapshot := true
 
 packageSummary in Linux := "Time Tracking"
