@@ -3,18 +3,18 @@ package de.digitalstep.timetrack
 import java.util.Locale
 
 import com.typesafe.scalalogging.LazyLogging
-import de.digitalstep.timetrack.Repository.Delete
 import de.digitalstep.timetrack.ui._
 
 import scala.language.implicitConversions
 import scalafx.application.JFXApp
 import scalafx.collections.ObservableBuffer
-import scalafx.collections.ObservableBuffer.{Remove, Add}
+import scalafx.collections.ObservableBuffer.{Add, Remove}
 
 object Application extends JFXApp with LazyLogging {
   Locale.setDefault(Locale.GERMANY)
 
   private[this] val repository = Repository()
+  private[this] val actionProvider = new ActionProvider(repository)
 
   private[this] val workUnits = ObservableBuffer {
     repository.findAll.map(WorkUnitAdapter.apply).toSeq
@@ -28,6 +28,6 @@ object Application extends JFXApp with LazyLogging {
     }
   })
 
-  stage = ui.PrimaryStage(workUnits, repository.findAllTasks)
+  stage = ui.PrimaryStage(actionProvider, workUnits)
   ui.StageTrayIcon(stage)
 }
