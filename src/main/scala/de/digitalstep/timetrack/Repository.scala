@@ -39,6 +39,10 @@ class Repository(storage: Storage) extends LazyLogging {
     _ add _
   }
 
+  def findAllTasks: Iterable[String] = findAll map (_.description)
+
+  def findTasks(prefix: String): Iterable[String] = findAllTasks filter (_ startsWith prefix)
+
   def add(workUnit: WorkUnit): Repository = {
     logger.debug("Adding {}", workUnit)
     def notify(listener: Change ⇒ Unit) = listener(Add(workUnit))

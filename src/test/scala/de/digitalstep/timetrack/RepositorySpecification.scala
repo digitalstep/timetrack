@@ -50,6 +50,21 @@ class RepositorySpecification extends PropertySpecification {
     }
   }
 
+  property("findTasks") {
+    val data: List[Day] = List(
+      Day(date(2016, 1, 1), Seq(
+        Task(time(9, 0), time(10, 0), "Development"),
+        Task(time(9, 0), time(10, 0), "Development"))),
+      Day(date(2016, 1, 1), Seq(
+        Task(time(9, 0), time(10, 0), "Development"),
+        Task(time(9, 0), time(10, 0), "other")))
+    )
+
+    repository(data).findTasks("Dev") should contain theSameElementsAs Seq("Development")
+    repository(data).findTasks("other") should contain theSameElementsAs Seq("other")
+    repository(data).findTasks("other2") shouldBe empty
+  }
+
   property("add") {
     forAll { (data: List[Day], workUnit: WorkUnit) ⇒
       repository(data).add(Seq(workUnit)).findAll should contain(workUnit)
