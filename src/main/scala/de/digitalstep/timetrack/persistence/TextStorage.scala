@@ -27,7 +27,7 @@ private[persistence] object TextStorage {
     fromInputStream(file.inputStream()).mkString
   }
 
-  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung2.txt"
+  private[this] val path = sys.props("user.home") / ".digitalstep" / "Zeiterfassung.txt"
 
   def apply(): TextStorage = apply(path)
 

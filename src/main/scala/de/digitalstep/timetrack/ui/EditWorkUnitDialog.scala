@@ -1,5 +1,7 @@
 package de.digitalstep.timetrack.ui
 
+import org.controlsfx.control.textfield.TextFields
+
 import scalafx.Includes._
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Node
@@ -8,18 +10,21 @@ import scalafx.scene.control.Dialog
 import scalafx.scene.layout.GridPane
 
 object EditWorkUnitDialog {
-  def create(workUnits: ObservableBuffer[WorkUnitAdapter]): Unit = edit(WorkUnitAdapter()) { x ⇒
-    workUnits.add(x)
-    workUnits.sort((a, b) ⇒ a.get > b.get)
-  }
+  def create(taskSuggestions: Set[String], workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
+    edit(WorkUnitAdapter(), taskSuggestions) { x ⇒
+      workUnits.add(x)
+      workUnits.sort((a, b) ⇒ a.get > b.get)
+    }
 
-  def update(adapter: WorkUnitAdapter, workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
-    edit(adapter) { x ⇒
+  def update(adapter: WorkUnitAdapter,
+             taskSuggestions: Set[String],
+             workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
+    edit(adapter, taskSuggestions) { x ⇒
       workUnits.replaceAll(x, x)
     }
 
-  private[this] def edit(adapter: WorkUnitAdapter)(fn: WorkUnitAdapter ⇒ Unit): Unit = {
-    val dialog = new EditWorkUnitDialog(adapter)
+  private[this] def edit(adapter: WorkUnitAdapter, taskSuggestions: Set[String])(fn: WorkUnitAdapter ⇒ Unit): Unit = {
+    val dialog = new EditWorkUnitDialog(adapter, taskSuggestions)
     dialog.showAndWait() match {
       case Some(_) ⇒ fn(dialog.getResult)
       case _ ⇒ println("Cancelled")
@@ -27,7 +32,8 @@ object EditWorkUnitDialog {
   }
 }
 
-class EditWorkUnitDialog(val workUnit: WorkUnitAdapter) extends Dialog[WorkUnitAdapter] with WorkUnitInput {
+class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, taskSuggestions: Set[String])
+  extends Dialog[WorkUnitAdapter] with WorkUnitInput {
   title = "Add Entry"
 
   dialogPane().content = new GridPane {
@@ -46,6 +52,8 @@ class EditWorkUnitDialog(val workUnit: WorkUnitAdapter) extends Dialog[WorkUnitA
       GridPane.setConstraints(right, 1, y)
     }
 
+    TextFields.bindAutoCompletion(descriptionText, collection.JavaConversions.asJavaCollection(taskSuggestions))
+
     children = nodes.flatMap(tuple ⇒ Seq(tuple._1, tuple._2))
   }
 
@@ -54,6 +62,5 @@ class EditWorkUnitDialog(val workUnit: WorkUnitAdapter) extends Dialog[WorkUnitA
     case OK ⇒ workUnit
     case _ ⇒ null
   }
-
 
 }

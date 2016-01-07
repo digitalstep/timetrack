@@ -9,19 +9,19 @@ import scalafx.scene.layout.BorderPane
 
 object PrimaryStage {
 
-  def apply(workUnits: ObservableBuffer[WorkUnitAdapter]): JFXApp.PrimaryStage =
+  def apply(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Iterable[String]): JFXApp.PrimaryStage =
     new JFXApp.PrimaryStage {
       title = "timetrack"
       scene = new Scene {
         root = new BorderPane {
 
-          top = toolbar(workUnits)
+          top = toolbar(workUnits, taskSuggestions)
 
           center = new TabPane {
             tabs = Seq(
               new Tab {
                 text = "Erfassung"
-                content = workUnitTable(workUnits)
+                content = workUnitTable(workUnits, taskSuggestions.toSet)
               }
             )
           }
@@ -29,14 +29,14 @@ object PrimaryStage {
       }
     }
 
-  private[this] def workUnitTable(workUnits: ObservableBuffer[WorkUnitAdapter]): WorkUnitTable =
-    new WorkUnitTable(workUnits)
+  private[this] def workUnitTable(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Set[String]): WorkUnitTable =
+    new WorkUnitTable(workUnits, taskSuggestions)
 
-  private[this] def toolbar(workUnits: ObservableBuffer[WorkUnitAdapter]) = new ToolBar {
+  private[this] def toolbar(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Iterable[String]) = new ToolBar {
     content = Seq(
       new Button {
         text = "+"
-        onAction = { () ⇒ EditWorkUnitDialog.create(workUnits) }
+        onAction = { () ⇒ EditWorkUnitDialog.create(taskSuggestions.toSet, workUnits) }
       }
     )
   }

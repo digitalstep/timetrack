@@ -10,7 +10,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
-class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView[WorkUnitAdapter] with ColumnFactory {
+class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Set[String]) extends TableView[WorkUnitAdapter] with ColumnFactory {
   items = buffer
 
   columns ++= Seq(
@@ -24,7 +24,7 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter]) extends TableView
 
   private[this] lazy val editItem = new MenuItem {
     text = "Edit"
-    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, buffer)
+    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, taskSuggestions, buffer)
   }
 
   def firstSelected: WorkUnitAdapter = {
