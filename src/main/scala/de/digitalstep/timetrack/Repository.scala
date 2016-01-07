@@ -61,12 +61,22 @@ class Repository(storage: Storage) extends LazyLogging {
     this
   }
 
-  def onChange(op: Change ⇒ Unit): Subscription = {
-    listeners += op
-    new Subscription(op)
-  }
+  /**
+    * Adds a new listener to the repository
+    *
+    * @param op operation to be executed on changes
+    * @return a new Subscription
+    */
+  def onChange(op: Change ⇒ Unit): Subscription = new Subscription(op)
 
-  class Subscription(op: Change ⇒ Unit) {
+  /**
+    * Can be cancelled to remove a listener from the repository.
+    *
+    * @param op operation to be executed on changes
+    */
+  class Subscription private[Repository](op: Change ⇒ Unit) {
+    listeners += op
+
     def cancel() = listeners -= op
   }
 
