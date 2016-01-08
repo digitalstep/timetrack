@@ -4,6 +4,7 @@ import javafx.util.Callback
 
 import org.controlsfx.control.textfield.AutoCompletionBinding.ISuggestionRequest
 import org.controlsfx.control.textfield.{AutoCompletionBinding, TextFields}
+import org.controlsfx.validation.{Validator, ValidationSupport}
 
 import scala.collection.JavaConversions.asJavaCollection
 import scalafx.Includes._
@@ -40,6 +41,9 @@ object EditWorkUnitDialog {
 
 class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, suggestionProvider: String ⇒ Iterable[String])
   extends Dialog[WorkUnitAdapter] with WorkUnitInput {
+
+  private[this] val validationSupport = new ValidationSupport()
+
   title = "Add Entry"
 
   dialogPane().content = new GridPane {
@@ -62,6 +66,11 @@ class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, suggestionProvider: Stri
       new Callback[AutoCompletionBinding.ISuggestionRequest, java.util.Collection[String]] {
         override def call(param: ISuggestionRequest) = suggestionProvider(param.getUserText)
       })
+
+    validationSupport.registerValidator(descriptionText, Validator.createEmptyValidator("Text is required"))
+//    validationSupport.validationResultProperty().addListener((o, oldValue, validationResult) -> {
+//      messageList.getItems().setAll(validationResult.getMessages())
+//    })
 
     children = nodes.flatMap(tuple ⇒ Seq(tuple._1, tuple._2))
   }
