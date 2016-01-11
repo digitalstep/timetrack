@@ -9,7 +9,8 @@ import scalafx.scene.layout.BorderPane
 
 object PrimaryStage {
 
-  def apply(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Iterable[String]): JFXApp.PrimaryStage =
+  def apply(workUnits: ObservableBuffer[WorkUnitAdapter],
+            taskSuggestions: String ⇒ Iterable[String]): JFXApp.PrimaryStage =
     new JFXApp.PrimaryStage {
       title = "timetrack"
       scene = new Scene {
@@ -21,7 +22,7 @@ object PrimaryStage {
             tabs = Seq(
               new Tab {
                 text = "Erfassung"
-                content = workUnitTable(workUnits, taskSuggestions.toSet)
+                content = workUnitTable(workUnits, taskSuggestions)
               }
             )
           }
@@ -29,17 +30,19 @@ object PrimaryStage {
       }
     }
 
-  private[this] def workUnitTable(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Set[String]): WorkUnitTable =
+  private[this] def workUnitTable(workUnits: ObservableBuffer[WorkUnitAdapter],
+                                  taskSuggestions: String ⇒ Iterable[String]): WorkUnitTable =
     new WorkUnitTable(workUnits, taskSuggestions)
 
-  private[this] def toolbar(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Iterable[String]) = new ToolBar {
-    content = Seq(
-      new Button {
-        text = "+"
-        onAction = { () ⇒ EditWorkUnitDialog.create(taskSuggestions.toSet, workUnits) }
-      }
-    )
-  }
+  private[this] def toolbar(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: String ⇒ Iterable[String]) =
+    new ToolBar {
+      content = Seq(
+        new Button {
+          text = "+"
+          onAction = { () ⇒ EditWorkUnitDialog.create(taskSuggestions, workUnits) }
+        }
+      )
+    }
 
 
 }

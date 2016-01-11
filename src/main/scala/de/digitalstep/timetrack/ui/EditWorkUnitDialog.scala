@@ -10,20 +10,21 @@ import scalafx.scene.control.Dialog
 import scalafx.scene.layout.GridPane
 
 object EditWorkUnitDialog {
-  def create(taskSuggestions: Set[String], workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
+  def create(taskSuggestions: String ⇒ Iterable[String], workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
     edit(WorkUnitAdapter(), taskSuggestions) { x ⇒
       workUnits.add(x)
       workUnits.sort((a, b) ⇒ a.get > b.get)
     }
 
   def update(adapter: WorkUnitAdapter,
-             taskSuggestions: Set[String],
+             taskSuggestions: String ⇒ Iterable[String],
              workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
     edit(adapter, taskSuggestions) { x ⇒
       workUnits.replaceAll(x, x)
     }
 
-  private[this] def edit(adapter: WorkUnitAdapter, taskSuggestions: Set[String])(fn: WorkUnitAdapter ⇒ Unit): Unit = {
+  private[this] def edit(adapter: WorkUnitAdapter, taskSuggestions: String ⇒ Iterable[String])
+                        (fn: WorkUnitAdapter ⇒ Unit): Unit = {
     val dialog = new EditWorkUnitDialog(adapter, taskSuggestions)
     dialog.showAndWait() match {
       case Some(_) ⇒ fn(dialog.getResult)
@@ -32,7 +33,7 @@ object EditWorkUnitDialog {
   }
 }
 
-class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, taskSuggestions: Set[String])
+class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, taskSuggestions: String ⇒ Iterable[String])
   extends Dialog[WorkUnitAdapter] with WorkUnitInput {
   title = "Add Entry"
 
@@ -52,7 +53,8 @@ class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, taskSuggestions: Set[Str
       GridPane.setConstraints(right, 1, y)
     }
 
-    TextFields.bindAutoCompletion(descriptionText, collection.JavaConversions.asJavaCollection(taskSuggestions))
+    TextFields.bindAutoCompletion(descriptionText,
+      collection.JavaConversions.asJavaCollection(taskSuggestions("")))
 
     children = nodes.flatMap(tuple ⇒ Seq(tuple._1, tuple._2))
   }

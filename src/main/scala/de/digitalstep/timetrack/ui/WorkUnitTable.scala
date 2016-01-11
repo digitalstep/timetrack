@@ -10,7 +10,9 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
-class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Set[String]) extends TableView[WorkUnitAdapter] with ColumnFactory {
+class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter],
+                    taskSuggestions: String ⇒ Iterable[String])
+  extends TableView[WorkUnitAdapter] with ColumnFactory {
   items = buffer
 
   columns ++= Seq(
