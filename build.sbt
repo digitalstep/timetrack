@@ -18,7 +18,7 @@ enablePlugins(JDKPackagerPlugin)
 libraryDependencies ++= Seq(
   "org.parboiled" %% "parboiled" % "2.1.0",
   "org.scalafx" %% "scalafx" % "8.0.60-R9",
-  "org.controlsfx" % "controlsfx" % "8.40.9",
+  "org.controlsfx" % "controlsfx" % "8.40.10",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "org.scalatest" %% "scalatest" % "2.2.4" % Test,
