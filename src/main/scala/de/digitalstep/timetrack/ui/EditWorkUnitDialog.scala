@@ -16,11 +16,9 @@ object EditWorkUnitDialog {
       workUnits.sort((a, b) ⇒ a.get > b.get)
     }
 
-  def update(adapter: WorkUnitAdapter,
-             taskSuggestions: String ⇒ Iterable[String],
-             workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
-    edit(adapter, taskSuggestions) { x ⇒
-      workUnits.replaceAll(x, x)
+  def update(adapter: WorkUnitAdapter, actionProvider: ActionProvider): Unit =
+    edit(adapter, actionProvider.suggest) { x ⇒
+      actionProvider.workUnits.replaceAll(x, x)
     }
 
   private[this] def edit(adapter: WorkUnitAdapter, taskSuggestions: String ⇒ Iterable[String])

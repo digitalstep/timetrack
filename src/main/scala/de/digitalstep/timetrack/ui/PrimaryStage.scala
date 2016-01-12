@@ -1,47 +1,44 @@
 package de.digitalstep.timetrack.ui
 
-import scalafx.Includes._
+import javafx.event.{ActionEvent, EventHandler}
+
 import scalafx.application.JFXApp
-import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Tab, TabPane, ToolBar}
 import scalafx.scene.layout.BorderPane
 
 object PrimaryStage {
 
-  def apply(workUnits: ObservableBuffer[WorkUnitAdapter],
-            taskSuggestions: String ⇒ Iterable[String]): JFXApp.PrimaryStage =
+  def apply(actionProvider: ActionProvider): JFXApp.PrimaryStage =
     new JFXApp.PrimaryStage {
       title = "timetrack"
       scene = new Scene {
         root = new BorderPane {
 
-          top = toolbar(workUnits, taskSuggestions)
+          top = toolbar()
 
           center = new TabPane {
             tabs = Seq(
               new Tab {
                 text = "Erfassung"
-                content = workUnitTable(workUnits, taskSuggestions)
+                content = workUnitTable()
               }
             )
           }
         }
       }
-    }
 
-  private[this] def workUnitTable(workUnits: ObservableBuffer[WorkUnitAdapter],
-                                  taskSuggestions: String ⇒ Iterable[String]): WorkUnitTable =
-    new WorkUnitTable(workUnits, taskSuggestions)
+      private[this] def workUnitTable() = new WorkUnitTable(actionProvider) {
+        items = actionProvider.workUnits
+      }
 
-  private[this] def toolbar(workUnits: ObservableBuffer[WorkUnitAdapter], taskSuggestions: String ⇒ Iterable[String]) =
-    new ToolBar {
-      content = Seq(
-        new Button {
-          text = "+"
-          onAction = { () ⇒ EditWorkUnitDialog.create(taskSuggestions, workUnits) }
-        }
-      )
+      private[this] def toolbar() = new ToolBar {
+        content = Seq(
+          new Button("+") {
+            onAction = actionProvider.createWorkUnit
+          }
+        )
+      }
     }
 
 
