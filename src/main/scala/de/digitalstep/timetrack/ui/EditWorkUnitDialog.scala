@@ -3,20 +3,19 @@ package de.digitalstep.timetrack.ui
 import org.controlsfx.control.textfield.TextFields
 
 import scalafx.Includes._
-import scalafx.collections.ObservableBuffer
 import scalafx.scene.Node
 import scalafx.scene.control.ButtonType.{Cancel, OK}
 import scalafx.scene.control.Dialog
 import scalafx.scene.layout.GridPane
 
 object EditWorkUnitDialog {
-  def create(taskSuggestions: String ⇒ Iterable[String], workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
-    edit(WorkUnitAdapter(), taskSuggestions) { x ⇒
-      workUnits.add(x)
-      workUnits.sort((a, b) ⇒ a.get > b.get)
+  def create(actionProvider: ActionContext): Unit =
+    edit(WorkUnitAdapter(), actionProvider.suggest) { x ⇒
+      actionProvider.workUnits.add(x)
+      actionProvider.workUnits.sort((a, b) ⇒ a.get > b.get)
     }
 
-  def update(adapter: WorkUnitAdapter, actionProvider: ActionProvider): Unit =
+  def update(adapter: WorkUnitAdapter, actionProvider: ActionContext): Unit =
     edit(adapter, actionProvider.suggest) { x ⇒
       actionProvider.workUnits.replaceAll(x, x)
     }

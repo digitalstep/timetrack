@@ -1,7 +1,6 @@
 package de.digitalstep.timetrack.ui
 
 import java.time.{LocalDate, LocalTime}
-import javafx.event.{ActionEvent, EventHandler}
 
 import de.digitalstep.timetrack.ui.converters.{LocalDateStringConverter, LocalTimeStringConverter}
 
@@ -10,7 +9,7 @@ import scalafx.beans.value.ObservableValue
 import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
-abstract class WorkUnitTable(actionProvider: ActionProvider) extends TableView[WorkUnitAdapter] with ColumnFactory {
+abstract class WorkUnitTable(actionProvider: ActionContext) extends TableView[WorkUnitAdapter] with ColumnFactory {
 
   columns ++= Seq(
     dateColumn("Date", _.value.dayProperty),
