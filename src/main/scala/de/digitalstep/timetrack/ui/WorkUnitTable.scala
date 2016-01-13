@@ -10,7 +10,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
-class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], provider: ActionProvider) extends TableView[WorkUnitAdapter] with ColumnFactory {
+class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Set[String]) extends TableView[WorkUnitAdapter] with ColumnFactory {
   items = buffer
 
   columns ++= Seq(
@@ -24,16 +24,16 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], provider: ActionP
 
   private[this] lazy val editItem = new MenuItem {
     text = "Edit"
-    onAction = provider.updateWorkUnit(firstSelected)
+    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, taskSuggestions, buffer)
   }
 
   def firstSelected: WorkUnitAdapter = {
     selectionModel.value.selectedItems.head
   }
 
-  private[this] lazy val removeItem = new MenuItem {
+  private[this] lazy val removeItem = new MenuItem{
     text = "Remove"
-    onAction = provider.deleteWorkUnit(firstSelected)
+    onAction = () ⇒ buffer -= firstSelected
   }
 
 }
@@ -49,11 +49,10 @@ trait ColumnFactory {
   protected[this] def timeColumn(text: String, property: CellValueFactory[LocalTime]) =
     column(text, property, LocalTimeStringConverter.short)
 
-  protected[this] def stringColumn(_text: String, observable: CellValueFactory[String]): WorkUnitColumn =
-    new WorkUnitColumn {
-      text = _text
-      cellValueFactory = x ⇒ observable(x)
-    }
+  protected[this] def stringColumn(_text: String, observable: CellValueFactory[String]): WorkUnitColumn = new WorkUnitColumn {
+    text = _text
+    cellValueFactory = x ⇒ observable(x)
+  }
 
   private[this] def column[T](_text: String,
                               observable: CellValueFactory[T],
