@@ -13,14 +13,16 @@ import scalafx.stage.Stage
 
 object StageTrayIcon extends Runnables with LazyLogging {
 
-  def apply(stage: Stage): () ⇒ Unit = {
-    if (SystemTray.isSupported) setupTrayIcon(stage)
+  type Finalizer = () ⇒ Unit
+
+  def apply(stage: Stage, actionContext: ActionContext): Finalizer = {
+    if (SystemTray.isSupported) setupTrayIcon(stage, actionContext)
     else () ⇒ sys.exit()
   }
 
-  private[this] def setupTrayIcon(stage: Stage) = {
+  private[this] def setupTrayIcon(stage: Stage, actionContext: ActionContext) = {
     Platform.implicitExit = false
-    val trayIcon = new StageTrayIcon(stage)
+    val trayIcon = new StageTrayIcon(stage, actionContext)
     SwingUtilities.invokeLater(trayIcon.initializer)
     getRuntime.addShutdownHook(new Thread(trayIcon.finalizer))
     trayIcon.finalizer
@@ -28,7 +30,7 @@ object StageTrayIcon extends Runnables with LazyLogging {
 
 }
 
-class StageTrayIcon(stage: Stage) extends ImplicitActionListeners with LazyLogging {
+class StageTrayIcon(stage: Stage, actionContext: ActionContext) extends ImplicitActionListeners with LazyLogging {
 
   import Platform.runLater
 
@@ -50,9 +52,14 @@ class StageTrayIcon(stage: Stage) extends ImplicitActionListeners with LazyLoggi
     logger.debug("Removed system tray icon")
   }
 
-  private[this] def popupMenu = Build(new PopupMenu)(_ add quitItem)
+  private lazy val newEntry = () ⇒ {
+    runLater(EditWorkUnitDialog.create(actionContext))
+  }
 
-  private[this] def quitItem = Build(new MenuItem("Quit"))(_ addActionListener finalizer)
+  private[this] def popupMenu = Build(new PopupMenu) { m ⇒
+    m add Build(new MenuItem("Quit"))(_ addActionListener finalizer)
+    m add Build(new MenuItem("New Entry"))(_ addActionListener newEntry)
+  }
 
   private[this] def toggleStage(): Unit = if (stage.isShowing) stage.hide() else stage.show()
 
