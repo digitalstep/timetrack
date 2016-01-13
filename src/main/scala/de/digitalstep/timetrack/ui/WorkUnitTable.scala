@@ -6,7 +6,8 @@ import de.digitalstep.timetrack.ui.converters.{LocalDateStringConverter, LocalTi
 
 import scalafx.Includes._
 import scalafx.beans.value.ObservableValue
-import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
+import scalafx.scene.control._
+import scalafx.scene.control.SelectionMode.MULTIPLE
 import scalafx.util.StringConverter
 
 abstract class WorkUnitTable(actionProvider: ActionContext) extends TableView[WorkUnitAdapter] with ColumnFactory {
@@ -18,24 +19,25 @@ abstract class WorkUnitTable(actionProvider: ActionContext) extends TableView[Wo
     stringColumn("Description", _.value.descriptionProperty)
   )
 
+  selectionModel.value.selectionMode = MULTIPLE
+
   contextMenu = new ContextMenu(editItem, removeItem)
 
   private[this] lazy val editItem = new MenuItem {
     text = "Edit"
-    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, actionProvider)
+    onAction = () ⇒ EditWorkUnitDialog.update(selectedItems.head, actionProvider)
   }
-
-  def firstSelected = selectionModel.value.selectedItems.head
-
 
   private[this] lazy val removeItem = new MenuItem {
     text = "Remove"
-    onAction = () ⇒ actionProvider.workUnits -= firstSelected
+    onAction = () ⇒ actionProvider.workUnits --= selectedItems
   }
+
+  private[this] def selectedItems = selectionModel.value.selectedItems
 
 }
 
-trait ColumnFactory {
+private[ui] trait ColumnFactory {
   type CellValueFactory[T] = TableColumn.CellDataFeatures[WorkUnitAdapter, String] => ObservableValue[T, T]
 
   type WorkUnitColumn = TableColumn[WorkUnitAdapter, String]

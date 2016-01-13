@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities
 
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.language.implicitConversions
 import scalafx.application.Platform
 import scalafx.stage.Stage
 
