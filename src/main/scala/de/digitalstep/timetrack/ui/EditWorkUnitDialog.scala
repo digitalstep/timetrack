@@ -27,6 +27,13 @@ object EditWorkUnitDialog {
       workUnits.replaceAll(x, x)
     }
 
+  def update(adapter: WorkUnitAdapter,
+             taskSuggestions: String ⇒ Iterable[String],
+             workUnits: ObservableBuffer[WorkUnitAdapter]): Unit =
+    edit(adapter, taskSuggestions) { x ⇒
+      workUnits.replaceAll(x, x)
+    }
+
   private[this] def edit(adapter: WorkUnitAdapter,
                          taskSuggestions: String ⇒ Iterable[String])
                         (fn: WorkUnitAdapter ⇒ Unit): Unit = {
