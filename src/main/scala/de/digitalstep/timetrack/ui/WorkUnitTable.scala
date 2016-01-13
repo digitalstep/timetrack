@@ -6,12 +6,10 @@ import de.digitalstep.timetrack.ui.converters.{LocalDateStringConverter, LocalTi
 
 import scalafx.Includes._
 import scalafx.beans.value.ObservableValue
-import scalafx.collections.ObservableBuffer
 import scalafx.scene.control.{ContextMenu, MenuItem, TableColumn, TableView}
 import scalafx.util.StringConverter
 
-class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], taskSuggestions: Set[String]) extends TableView[WorkUnitAdapter] with ColumnFactory {
-  items = buffer
+abstract class WorkUnitTable(actionProvider: ActionContext) extends TableView[WorkUnitAdapter] with ColumnFactory {
 
   columns ++= Seq(
     dateColumn("Date", _.value.dayProperty),
@@ -24,16 +22,15 @@ class WorkUnitTable(buffer: ObservableBuffer[WorkUnitAdapter], taskSuggestions: 
 
   private[this] lazy val editItem = new MenuItem {
     text = "Edit"
-    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, taskSuggestions, buffer)
+    onAction = () ⇒ EditWorkUnitDialog.update(firstSelected, actionProvider)
   }
 
-  def firstSelected: WorkUnitAdapter = {
-    selectionModel.value.selectedItems.head
-  }
+  def firstSelected = selectionModel.value.selectedItems.head
 
-  private[this] lazy val removeItem = new MenuItem{
+
+  private[this] lazy val removeItem = new MenuItem {
     text = "Remove"
-    onAction = () ⇒ buffer -= firstSelected
+    onAction = () ⇒ actionProvider.workUnits -= firstSelected
   }
 
 }
