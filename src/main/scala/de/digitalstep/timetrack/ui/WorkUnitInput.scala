@@ -1,12 +1,17 @@
 package de.digitalstep.timetrack.ui
 
 import java.time.LocalDate
-import de.digitalstep.timetrack.ui.converters.LocalTimeStringConverter
 
-import scalafx.scene.control.{TextFormatter, DatePicker, Label, TextField}
+import de.digitalstep.timetrack.ui.converters.LocalTimeStringConverter
+import org.controlsfx.control.textfield.TextFields
+import scala.collection.JavaConversions._
+
+import scalafx.scene.control.{DatePicker, Label, TextField, TextFormatter}
 
 trait WorkUnitInput {
+
   val workUnit: WorkUnitAdapter
+  val suggest: String ⇒ Iterable[String]
 
   import workUnit._
 
@@ -36,5 +41,7 @@ trait WorkUnitInput {
   lazy val descriptionText = new TextField {
     text <==> descriptionProperty
   }
+
+  TextFields.bindAutoCompletion(descriptionText, asJavaCollection(suggest("")))
 
 }

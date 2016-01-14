@@ -66,13 +66,6 @@ class StageTrayIcon(stage: Stage, actionContext: ActionContext) extends Implicit
 
 }
 
-object Build {
-  def apply[T](t: T)(f: T ⇒ Any): T = {
-    f(t)
-    t
-  }
-}
-
 trait Runnables {
   protected implicit def runnable(f: () ⇒ Unit): Runnable = new Runnable {
     def run() = f()

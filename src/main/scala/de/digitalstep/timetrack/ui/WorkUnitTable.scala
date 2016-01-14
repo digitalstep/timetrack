@@ -48,10 +48,11 @@ private[ui] trait ColumnFactory {
   protected[this] def timeColumn(text: String, property: CellValueFactory[LocalTime]) =
     column(text, property, LocalTimeStringConverter.short)
 
-  protected[this] def stringColumn(_text: String, observable: CellValueFactory[String]): WorkUnitColumn = new WorkUnitColumn {
-    text = _text
-    cellValueFactory = x ⇒ observable(x)
-  }
+  protected[this] def stringColumn(_text: String, observable: CellValueFactory[String]) =
+    new WorkUnitColumn {
+      text = _text
+      cellValueFactory = x ⇒ observable(x)
+    }
 
   private[this] def column[T](_text: String,
                               observable: CellValueFactory[T],

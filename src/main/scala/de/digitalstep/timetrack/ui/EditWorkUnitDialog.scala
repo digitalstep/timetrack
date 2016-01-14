@@ -1,8 +1,11 @@
 package de.digitalstep.timetrack.ui
 
-import org.controlsfx.control.textfield.TextFields
+import org.controlsfx.validation.ValidationSupport
+import org.controlsfx.validation.Validator.createEmptyValidator
 
+import scala.collection.JavaConversions._
 import scalafx.Includes._
+import scalafx.beans.property.{ReadOnlyBooleanProperty, BooleanProperty}
 import scalafx.scene.Node
 import scalafx.scene.control.ButtonType.{Cancel, OK}
 import scalafx.scene.control.Dialog
@@ -20,46 +23,56 @@ object EditWorkUnitDialog {
       actionProvider.workUnits.replaceAll(x, x)
     }
 
-  private[this] def edit(adapter: WorkUnitAdapter, taskSuggestions: String ⇒ Iterable[String])
+  private[this] def edit(adapter: WorkUnitAdapter, suggest: String ⇒ Iterable[String])
                         (fn: WorkUnitAdapter ⇒ Unit): Unit = {
-    val dialog = new EditWorkUnitDialog(adapter, taskSuggestions)
+    val dialog = new EditWorkUnitDialog(adapter, suggest)
     dialog.showAndWait() match {
       case Some(_) ⇒ fn(dialog.getResult)
-      case _ ⇒ println("Cancelled")
+      case _ ⇒ // nothing to do
     }
   }
 }
 
-class EditWorkUnitDialog(val workUnit: WorkUnitAdapter, taskSuggestions: String ⇒ Iterable[String])
+class EditWorkUnitDialog(val workUnit: WorkUnitAdapter,
+                         val suggest: String ⇒ Iterable[String])
   extends Dialog[WorkUnitAdapter] with WorkUnitInput {
+
+  val support = new ValidationSupport
+
   title = "Add Entry"
 
-  dialogPane().content = new GridPane {
-    hgap = 5
-    vgap = 5
-
-    val nodes: Seq[(Node, Node)] = Seq(
-      (dayLabel, dayInput),
-      (fromLabel, fromText),
-      (toLabel, toText),
-      (descriptionLabel, descriptionText)
-    )
-
-    for ((y, (left, right)) ← (0 to nodes.size) zip nodes) {
-      GridPane.setConstraints(left, 0, y)
-      GridPane.setConstraints(right, 1, y)
-    }
-
-    TextFields.bindAutoCompletion(descriptionText,
-      collection.JavaConversions.asJavaCollection(taskSuggestions("")))
-
-    children = nodes.flatMap(tuple ⇒ Seq(tuple._1, tuple._2))
+  dialogPane().content = Build(createContentPane()) { x ⇒
+    support.registerValidator(descriptionText, createEmptyValidator("Description is equired"))
   }
 
   dialogPane().buttonTypes = Seq(OK, Cancel)
+
+  dialogPane().lookupButton(OK).disable <== new ReadOnlyBooleanProperty(support.invalidProperty())
+
   resultConverter = {
     case OK ⇒ workUnit
     case _ ⇒ null
+  }
+
+  private[this] def createContentPane(): GridPane = {
+    new GridPane {
+      hgap = 5
+      vgap = 5
+
+      private[this] val nodes: Seq[(Node, Node)] = Seq(
+        (dayLabel, dayInput),
+        (fromLabel, fromText),
+        (toLabel, toText),
+        (descriptionLabel, descriptionText)
+      )
+
+      children = nodes.flatMap(tuple ⇒ Seq(tuple._1, tuple._2))
+
+      for ((y, (left, right)) ← (0 to nodes.size) zip nodes) {
+        GridPane.setConstraints(left, 0, y)
+        GridPane.setConstraints(right, 1, y)
+      }
+    }
   }
 
 }
