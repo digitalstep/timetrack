@@ -11,7 +11,7 @@ import scalafx.application.JFXApp
 object Application extends JFXApp with LazyLogging {
   Locale.setDefault(Locale.GERMANY)
 
-  private[this] val actionContext = new ActionContext(Repository())
+  private[this] val actionContext = new DefaultActionContext(Repository())
 
   stage = ui.PrimaryStage(actionContext)
 

@@ -6,8 +6,13 @@ import de.digitalstep.timetrack.Repository
 import scalafx.collections.ObservableBuffer.{Add, Remove}
 import scalafx.collections.{ObservableBuffer, ObservableSet}
 
+trait ActionContext {
+  val workUnits: ObservableBuffer[WorkUnitAdapter]
 
-class ActionContext(repository: Repository) extends LazyLogging {
+  def suggest(prefix: String): Iterable[String]
+}
+
+class DefaultActionContext(repository: Repository) extends ActionContext with LazyLogging {
 
   val workUnits = {
     val result = ObservableBuffer {

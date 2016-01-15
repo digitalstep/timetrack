@@ -5,7 +5,7 @@ import org.controlsfx.validation.Validator.createEmptyValidator
 
 import scala.collection.JavaConversions._
 import scalafx.Includes._
-import scalafx.beans.property.{ReadOnlyBooleanProperty, BooleanProperty}
+import scalafx.beans.property.ReadOnlyBooleanProperty
 import scalafx.scene.Node
 import scalafx.scene.control.ButtonType.{Cancel, OK}
 import scalafx.scene.control.Dialog
@@ -42,7 +42,7 @@ class EditWorkUnitDialog(val workUnit: WorkUnitAdapter,
   title = "Add Entry"
 
   dialogPane().content = Build(createContentPane()) { x ⇒
-    support.registerValidator(descriptionText, createEmptyValidator("Description is equired"))
+    support.registerValidator(descriptionText, createEmptyValidator("Description is required"))
   }
 
   dialogPane().buttonTypes = Seq(OK, Cancel)

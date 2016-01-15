@@ -16,12 +16,12 @@ object StageTrayIcon extends Runnables with LazyLogging {
 
   type Finalizer = () ⇒ Unit
 
-  def apply(stage: Stage, actionContext: ActionContext): Finalizer = {
+  def apply(stage: Stage, actionContext: DefaultActionContext): Finalizer = {
     if (SystemTray.isSupported) setupTrayIcon(stage, actionContext)
     else () ⇒ sys.exit()
   }
 
-  private[this] def setupTrayIcon(stage: Stage, actionContext: ActionContext) = {
+  private[this] def setupTrayIcon(stage: Stage, actionContext: DefaultActionContext) = {
     Platform.implicitExit = false
     val trayIcon = new StageTrayIcon(stage, actionContext)
     SwingUtilities.invokeLater(trayIcon.initializer)
@@ -31,7 +31,7 @@ object StageTrayIcon extends Runnables with LazyLogging {
 
 }
 
-class StageTrayIcon(stage: Stage, actionContext: ActionContext) extends ImplicitActionListeners with LazyLogging {
+class StageTrayIcon(stage: Stage, actionContext: DefaultActionContext) extends ImplicitActionListeners with LazyLogging {
 
   import Platform.runLater
 
@@ -57,9 +57,10 @@ class StageTrayIcon(stage: Stage, actionContext: ActionContext) extends Implicit
     runLater(EditWorkUnitDialog.create(actionContext))
   }
 
-  private[this] def popupMenu = Build(new PopupMenu) { m ⇒
-    m add Build(new MenuItem("Quit"))(_ addActionListener finalizer)
-    m add Build(new MenuItem("New Entry"))(_ addActionListener newEntry)
+  private[this] def popupMenu = Build(new PopupMenu) { m ⇒ import m._
+    add(Build(new MenuItem("New Entry"))(_ addActionListener newEntry))
+    addSeparator()
+    add(Build(new MenuItem("Quit"))(_ addActionListener finalizer))
   }
 
   private[this] def toggleStage(): Unit = if (stage.isShowing) stage.hide() else stage.show()

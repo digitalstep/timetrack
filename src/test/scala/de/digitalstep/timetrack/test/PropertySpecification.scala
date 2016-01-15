@@ -1,12 +1,10 @@
 package de.digitalstep.timetrack.test
 
-import org.scalatest.{Matchers, PropSpec}
 import org.scalatest.prop.PropertyChecks
+import org.scalatest.{Matchers, PropSpecLike}
 
 /**
   * Base class for property-based unit tests.
   */
-abstract class PropertySpecification
-  extends PropSpec with PropertyChecks
-  with Matchers
+trait PropertySpecification extends PropSpecLike with PropertyChecks with Matchers
 

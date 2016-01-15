@@ -22,5 +22,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "org.scalatest" %% "scalatest" % "2.2.4" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.12.5" % Test
+  "org.scalacheck" %% "scalacheck" % "1.12.5" % Test,
+  "org.testfx" % "testfx-core" % "4.0.+" % Test,
+  "org.testfx" % "testfx-junit" % "4.0.+" % Test
 )
