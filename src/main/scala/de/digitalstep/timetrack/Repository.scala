@@ -33,7 +33,9 @@ class Repository(storage: Storage) extends LazyLogging {
     tasks.toSeq.sorted.reverse
   }
 
-  def findDays: Map[LocalDate, Iterable[WorkUnit]] = findAll groupBy (_.date)
+  def findDays: Map[LocalDate, Iterable[WorkUnit]] = findAll.groupBy(_.date)
+
+  def findDaysSorted: Seq[(LocalDate, Iterable[WorkUnit])] = findDays.toSeq.sortBy(_._1).reverse
 
   def add(x: Traversable[WorkUnit]): Repository = x.foldLeft(this) {
     _ add _

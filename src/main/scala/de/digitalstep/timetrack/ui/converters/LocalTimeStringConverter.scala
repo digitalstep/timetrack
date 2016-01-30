@@ -1,6 +1,7 @@
 package de.digitalstep.timetrack.ui.converters
 
-import java.time.LocalTime
+import java.time.temporal.{ChronoUnit, Temporal, TemporalUnit}
+import java.time.{Duration, LocalTime}
 import java.time.format.{DateTimeFormatter, FormatStyle}
 
 import scalafx.util.StringConverter
@@ -18,3 +19,5 @@ class LocalTimeStringConverter private(style: FormatStyle) extends StringConvert
   override def toString(t: LocalTime): String = t.format(formatter)
 
 }
+
+

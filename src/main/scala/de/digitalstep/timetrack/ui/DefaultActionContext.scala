@@ -8,6 +8,7 @@ import scalafx.collections.{ObservableBuffer, ObservableSet}
 
 trait ActionContext {
   val workUnits: ObservableBuffer[WorkUnitAdapter]
+  val days: ObservableBuffer[DayAdapter]
 
   def suggest(prefix: String): Iterable[String]
 }
@@ -26,6 +27,13 @@ class DefaultActionContext(repository: Repository) extends ActionContext with La
       }
     })
     result
+  }
+
+  val days = ObservableBuffer {
+    repository.findDaysSorted.map { tuple ⇒
+      val (date, workUnits) = tuple
+      DayAdapter(date, workUnits)
+    }
   }
 
   def suggest(prefix: String): Iterable[String] = taskSuggestions.toSet filter (_ startsWith prefix)
