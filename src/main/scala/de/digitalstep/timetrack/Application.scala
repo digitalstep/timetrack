@@ -1,15 +1,16 @@
 package de.digitalstep.timetrack
 
 import java.util.Locale
+import java.util.Locale.GERMANY
 
 import com.typesafe.scalalogging.LazyLogging
 import de.digitalstep.timetrack.ui._
-
-import scala.language.implicitConversions
 import scalafx.application.JFXApp
 
+import scala.language.implicitConversions
+
 object Application extends JFXApp with LazyLogging {
-  Locale.setDefault(Locale.GERMANY)
+  Locale.setDefault(GERMANY)
 
   private[this] val actionContext = new DefaultActionContext(Repository())
 
