@@ -37,9 +37,7 @@ private[persistence] object TextStorage {
 
 }
 
-private[persistence] class TextStorage(
-                                        input: () ⇒ Iterable[Day],
-                                        output: Serializer)
+private[persistence] class TextStorage(input: () ⇒ Iterable[Day], output: Serializer)
   extends Storage with LazyLogging {
 
   val dayMap: mutable.Map[LocalDate, Set[Task]] = mutable.Map() ++

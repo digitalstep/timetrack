@@ -8,9 +8,7 @@ import scala.reflect.io.Path
 
 object Serializer {
 
-  def apply(path: Path): Serializer = new Serializer {
-    protected def outputStream() = path.toFile.outputStream()
-  }
+  def apply(path: Path): Serializer = () => path.toFile.outputStream()
 
   def apply(out: OutputStream) = new Serializer {
     protected def outputStream(): OutputStream = out

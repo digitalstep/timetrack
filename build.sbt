@@ -1,28 +1,27 @@
-name := "timetrack"
-version := "0.1"
-isSnapshot := true
+enablePlugins(JavaAppPackaging, JDKPackagerPlugin)
 
-packageSummary in Linux := "Time Tracking"
-packageDescription := "A simple tool with a journal to track time spent on projects"
+ThisBuild / name                := "timetrack"
+ThisBuild / version             := "0.1"
+ThisBuild / isSnapshot          := true
 
-maintainer := "Gunnar Bastkowski <gunnar@digitalstep.de>"
+ThisBuild / scalaVersion        := "2.12.6"
 
-scalaVersion := "2.11.7"
-crossScalaVersions := Seq("2.11.7")
+ThisBuild / maintainer          := "Gunnar Bastkowski <gunnar@digitalstep.de>"
+ThisBuild / packageDescription  := "A simple tool with a journal to track time spent on projects"
+ThisBuild / packageSummary in Linux := "Time Tracking"
 
-mainClass := Some("de.digitalstep.timetrack.Application")
+lazy val root = (project in file(".")).
+  configs(IntegrationTest).
+  settings(Defaults.itSettings)
 
-enablePlugins(JavaAppPackaging)
-enablePlugins(JDKPackagerPlugin)
-
-libraryDependencies ++= Seq(
-  "org.parboiled" %% "parboiled" % "2.1.0",
-  "org.scalafx" %% "scalafx" % "8.0.60-R9",
-  "org.controlsfx" % "controlsfx" % "8.40.10",
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0",
-  "ch.qos.logback" % "logback-classic" % "1.1.3",
-  "org.scalatest" %% "scalatest" % "2.2.4" % Test,
-  "org.scalacheck" %% "scalacheck" % "1.12.5" % Test,
-  "org.testfx" % "testfx-core" % "4.0.+" % Test,
-  "org.testfx" % "testfx-junit" % "4.0.+" % Test
-)
+root / mainClass := Some("de.digitalstep.timetrack.Application")
+root / libraryDependencies ++= Seq(
+  "org.parboiled"               %% "parboiled"      %  "2.1.4",
+  "org.scalafx"                 %%  "scalafx"       % "8.0.144-R12",
+  "org.controlsfx"              %   "controlsfx"    % "9.0.0",
+  "com.typesafe.scala-logging"  %% "scala-logging"  % "3.9.0",
+  "ch.qos.logback"              % "logback-classic" % "1.2.3",
+  "org.scalatest"               %% "scalatest"      % "3.0.5"   % "it,test",
+  "org.scalacheck"              %% "scalacheck"     % "1.14.0"  % "it,test",
+  "org.testfx"                  % "testfx-core"     % "4.0.+"   % "it,test",
+  "org.testfx"                  % "testfx-junit"    % "4.0.+"   % "it,test")
